@@ -1648,7 +1648,10 @@
     <Value>Visible to all customers</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Catalog.Attributes">
-    <Value>Attributes</Value>
+    <Value>Attributes</Value>   
+  </LocaleResource>
+  <LocaleResource Name="Admin.Commission">
+    <Value>Commission</Value>
   </LocaleResource>
   <LocaleResource Name="Admin.Catalog.Attributes.CheckoutAttributes">
     <Value>Checkout attributes</Value>

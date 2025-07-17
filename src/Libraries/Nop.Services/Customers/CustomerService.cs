@@ -49,6 +49,7 @@ public partial class CustomerService : ICustomerService
     protected readonly IShortTermCacheManager _shortTermCacheManager;
     protected readonly IStaticCacheManager _staticCacheManager;
     protected readonly IStoreContext _storeContext;
+    protected readonly IRepository<ParentChildRelations> _parentChildRelationsRepository;
     protected readonly ShoppingCartSettings _shoppingCartSettings;
     protected readonly TaxSettings _taxSettings;
 
@@ -1683,6 +1684,32 @@ public partial class CustomerService : ICustomerService
         return await GetCustomerAddressAsync(customer.Id, customer.ShippingAddressId ?? 0);
     }
 
+
+    /// <summary>
+    /// Get customer by username and email
+    /// </summary>
+    /// <param name="username">Username</param>
+    /// <param name="email">Email</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the customer
+    /// </returns>
+    public virtual async Task<Customer> GetCustomerByUsernameAndEmailAsync(string username, string email)
+    {
+        if (string.IsNullOrEmpty(username))
+            return null;
+
+        if (string.IsNullOrWhiteSpace(email))
+            return null;
+
+        var query = from c in _customerRepository.Table
+                    orderby c.Id
+                    where c.Username == username && c.Email == email
+                    select c;
+        var customer = await query.FirstOrDefaultAsync();
+
+        return customer;
+    }
     #endregion
 
     #endregion

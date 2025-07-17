@@ -1,0 +1,243 @@
+﻿@using Nop.Core
+@model CustomerInfoModel
+@inject Nop.Core.IWebHelper webHelper
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    NopHtml.AddTitleParts(T("PageTitle.Account").Text);
+    //page class
+    NopHtml.AppendPageCssClassParts("html-account-page");
+    NopHtml.AppendPageCssClassParts("html-customer-info-page");
+}
+
+@section left
+{
+    @await Component.InvokeAsync(typeof(CustomerNavigationViewComponent), new { selectedTabId = CustomerNavigationEnum.Commission })
+}
+
+<script type="text/javascript">
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth(); // 0-based
+
+    // Last day of the current month at 23:59:59
+    const lastDay = new Date(year, month + 1, 0, 23, 59, 59);
+
+    // First day of the next month at 00:00:00
+    const firstDayNextMonth = new Date(year, month + 1, 1, 0, 0, 0);
+
+    // Format to YYYY/MM/DD HH:mm:ss
+    const format = (date) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const h = String(date.getHours()).padStart(2, '0');
+        const min = String(date.getMinutes()).padStart(2, '0');
+        const s = String(date.getSeconds()).padStart(2, '0');
+        return `${y}/${m}/${d} ${h}:${min}:${s}`;
+    };
+
+    document.getElementById('lastDay-month').innerText = format(lastDay);
+    document.getElementById('firstDayNext-month').innerText = format(firstDayNextMonth);
+</script>
+
+
+<script type="text/javascript">
+    const now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth(); // 0-based, so 0 = January
+
+    if (month === 0) {
+        // If January, go to December of previous year
+        month = 12;
+        year -= 1;
+    }
+
+    const formattedMonth = String(month).padStart(2, '0');
+    document.getElementById('salary-month').innerText = `${year}/${formattedMonth}`;
+</script>
+
+<div class="page account-page customer-info-page">
+    <div class="page-title">
+        @* <h1>@T("Account.MyAccount") - @T("Account.CustomerInfo")</h1> *@
+        <h1>Reward</h1>
+    </div>
+    <div class="page-body">
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.CustomerInfoTop, additionalData = Model })
+        @* <form asp-route="MyForm" method="post"> *@
+            <div asp-validation-summary="ModelOnly" class="message-error"></div>
+            <div class="fieldset">
+                <div class="title">
+                    @* <strong>@T("Account.YourPersonalDetails")</strong> *@
+                    <strong>Your commission</strong>
+                    </br>
+                        <label style="color:red; font-size: 13px">
+                            * Commission will be updated by the end of the month:
+                            <span style="color:#777777; font-weight: bold; font-style: italic" id="lastDay-month"></span>
+                        </label>
+                    </br>
+                        <label style="color:red; font-size: 13px">
+                            * Commission will be paid within the first 5 working days of the following month.
+                        </label>
+                    </br>
+                        <label style="color:red; font-size: 13px">
+                            * Please check your commission starting from next month:
+                            <span style="color:#777777; font-weight: bold; font-style: italic" id="firstDayNext-month"></span>
+                        </label>
+                </div>
+                <div class="form-fields">
+                    <!-- Salary Month at Top -->
+                    <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;" id="salary-month"></div>
+
+                    <div class="inputs" style="overflow: hidden; padding: 5px 0;">
+                        <!-- Left: Paid Status -->
+                        @if (Model.ParentChildSumOrderStatsModel.IsPaid)
+                        {
+                            <div style="float: left; font-weight: bold; font-size: 16px; color: green;" id="paid-status">
+                                ✔ Paid
+                            </div>
+                        }
+                        else
+                        {                
+                            <div style="float: left; font-weight: bold; font-size: 16px; color: red;" id="paid-status">
+                                ✖ Not Paid
+                            </div>        
+                        }
+
+                        @{
+                            var payAmt = Model.ParentChildSumOrderStatsModel.PayAmount;
+                        }
+                        <!-- Right: Total Salary -->                        
+                        <div style="float: right; font-weight: bold; font-size: 16px;">
+                        <div id="salary-month" style="font-size: 14px;"></div>
+                            Total Salary: ¥ <span id="total-salary">@payAmt</span>
+                        </div>
+                    </div>
+                </div>
+                </br>
+                <div class="title">
+                    @* <strong>@T("Account.YourPersonalDetails")</strong> *@
+                    <strong>Your downline registration</strong>
+                </div>
+                <div class="form-fields">
+                    <div class="inputs">
+                        <label asp-for="Email" asp-postfix=":"></label>
+                        <input asp-for="Email" autocomplete="off" value="" />
+                        <nop-required />
+                        @* <span asp-validation-for="Email"></span> *@
+                        <span id="error"></span>
+                    </div>
+                 </div>
+                </br>
+                <div class="buttons">
+                    <button type="submit" id="save" name="save" class="button-1 save-customer-info-button">@T("Common.Save")</button>
+                </div>
+                <div class="title">
+                    @* <strong>@T("Account.YourPersonalDetails")</strong> *@
+                    <strong>Total downline count</strong>
+                    </br>
+                        <label style="color:red; font-size: 13px">* New added downline will be reflected by end of the day. Please come back and check by tomorrow.</label>
+                    </br>
+                    @{
+                        var lastUpdatedTimeUtc = Model.ParentChildLineStatsModel.FirstOrDefault()?.LastUpdatedTimeUtc;
+                        var lastUpdatedLocal = lastUpdatedTimeUtc.HasValue
+                        ? TimeZoneInfo.ConvertTimeFromUtc(lastUpdatedTimeUtc.Value, TimeZoneInfo.Local)
+                            : (DateTime?)null;
+                    }
+                    @if (Model.ParentChildLineStatsModel.FirstOrDefault().Id > 0)
+                    {
+                        <label style="color:red; font-size: 13px">* Latest total downline count updated at: <span style="color:#777777; font-weight: bold; font-style: italic">@lastUpdatedLocal.Value.ToString("yyyy-MM-dd HH:mm:ss")</span></label>
+                    }
+                    else
+                    {
+                        <label style="color:red; font-size: 13px">* 👀 No downlines spotted! It’s just you and... you. Time to call your friends, cousins, etc — let’s build your team! 🚀</label>
+                    }
+            </div>
+                <div class="form-fields">
+                    <div class="inputs">
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid black; background-color: #f0f0f0;">
+                            <thead style="background-color: #d0d0d0; height: 25px">
+                                <tr>
+                                    <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 1 (4%)</label></th>
+                                    <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 2 (2%)</label></th>
+                                    <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 3 (1%)</label></th>
+                                    <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 4 (0.5%)</label></th>
+                                </tr>
+                            </thead>
+                            <tbody style="height: 35px">
+                                @{
+                                    var level1 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 1)?.ChildCount ?? 0;
+                                    var level2 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 2)?.ChildCount ?? 0;
+                                    var level3 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 3)?.ChildCount ?? 0;
+                                    var level4 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 4)?.ChildCount ?? 0;
+                                }
+                                <tr>
+                                    <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                        <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level1</b></label>
+                                    </td>
+                                    <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                        <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level2</b></label>
+                                    </td>
+                                    <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                        <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level3</b></label>
+                                    </td>
+                                    <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                        <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level4</b></label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @* </form> *@
+        @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.CustomerInfoBottom, additionalData = Model })
+    </div>
+</div>
+
+<script asp-location="Footer">
+    $(function () {
+        $('#save').on('click', function () {
+            var email = $('input[name="Email"]').val();
+            var modelUsername = "@Model.Username";
+            var modelEmail = "@Model.Email";
+            console.log(email);
+            var postData = {
+                email: email,
+                modelUsername: modelUsername,
+                modelEmail: modelEmail
+            };
+            addAntiForgeryToken(postData);                         
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@Url.RouteUrl("CustomerInfo1")",
+                data: postData,
+                dataType: "json",
+                success: function (data, textStatus, jqXHR) {
+                    if (data.error) {
+                        //alert("Error: " + data.error);
+
+                        $('#error')
+                            .text(data.error)
+                            .addClass("field-validation-error")
+                            .removeClass("field-validation-valid");
+                    } else {
+                        $('#error')
+                            .text(data.message)
+                            .removeClass("field-validation-error")
+                            .addClass("field-validation-valid")
+                            .css("color", "green");
+
+                        //location.href = data.redirect;
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Request failed: " + jqXHR.responseText);
+                }
+            });
+        });
+    });
+</script>

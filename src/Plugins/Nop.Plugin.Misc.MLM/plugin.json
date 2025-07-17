@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Misc",
+  "FriendlyName": "MLM",
+  "SystemName": "Misc.MLM",
+  "Version": "4.70.7",
+  "SupportedVersions": [ "4.70" ],
+  "Author": "Kee",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.Misc.MLM.dll",
+  "Description": "This plugin allows to configure and manage MLM"
+}

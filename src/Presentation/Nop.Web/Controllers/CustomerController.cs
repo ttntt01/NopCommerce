@@ -1,4 +1,5 @@
 ﻿using System.Text.Encodings.Web;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Nop.Core;
@@ -32,6 +33,7 @@ using Nop.Services.Logging;
 using Nop.Services.Media;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
+using Nop.Services.ParentChild;
 using Nop.Services.Security;
 using Nop.Services.Tax;
 using Nop.Web.Factories;
@@ -90,6 +92,9 @@ public partial class CustomerController : BasePublicController
     protected readonly ITaxService _taxService;
     protected readonly IWorkContext _workContext;
     protected readonly IWorkflowMessageService _workflowMessageService;
+    protected readonly IParentChildRelationsService _parentChildRelationsService;
+    protected readonly IParentChildLineStatsService _parentChildLineStatsService;
+    protected readonly IParentChildSumOrderStatsService _parentChildSumOrderStatsService;
     protected readonly LocalizationSettings _localizationSettings;
     protected readonly MediaSettings _mediaSettings;
     protected readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
@@ -142,6 +147,9 @@ public partial class CustomerController : BasePublicController
         ITaxService taxService,
         IWorkContext workContext,
         IWorkflowMessageService workflowMessageService,
+        IParentChildRelationsService parentChildRelationsService,
+        IParentChildLineStatsService parentChildLineStatsService,
+        IParentChildSumOrderStatsService parentChildSumOrderStatsService,
         LocalizationSettings localizationSettings,
         MediaSettings mediaSettings,
         MultiFactorAuthenticationSettings multiFactorAuthenticationSettings,
@@ -189,6 +197,9 @@ public partial class CustomerController : BasePublicController
         _taxService = taxService;
         _workContext = workContext;
         _workflowMessageService = workflowMessageService;
+        _parentChildRelationsService = parentChildRelationsService;
+        _parentChildLineStatsService = parentChildLineStatsService;
+        _parentChildSumOrderStatsService = parentChildSumOrderStatsService;
         _localizationSettings = localizationSettings;
         _mediaSettings = mediaSettings;
         _multiFactorAuthenticationSettings = multiFactorAuthenticationSettings;
@@ -1342,6 +1353,185 @@ public partial class CustomerController : BasePublicController
 
         return View(model);
     }
+
+
+
+
+    public virtual async Task<IActionResult> Info1()
+    {
+        var customer = await _workContext.GetCurrentCustomerAsync();
+        if (!await _customerService.IsRegisteredAsync(customer))
+            return Challenge();
+
+        var model = new CustomerInfoModel();
+        model = await _customerModelFactory.PrepareCustomerInfoModelAsync(model, customer, false);
+
+
+        var stats = await _parentChildLineStatsService.GetParentChildLineStatsListAsync(customer.Id);
+
+        if (stats.Count <= 0)       
+        {
+            stats = new List<ParentChildLineStats> { 
+                new ParentChildLineStats
+                {
+                    Id = 0,
+                    ParentId = customer.Id,
+                    ParentEmail = customer.Email,
+                    LineLevel = "1",
+                    ChildCount = 1,
+                    CreatedDateTimeUtc = DateTime.UtcNow,
+                    LastUpdatedTimeUtc = DateTime.UtcNow,
+                },
+                new ParentChildLineStats
+                {
+                    Id = 0,
+                    ParentId = customer.Id,
+                    ParentEmail = customer.Email,
+                    LineLevel = "2",
+                    ChildCount = 0,
+                    CreatedDateTimeUtc = DateTime.UtcNow,
+                    LastUpdatedTimeUtc = DateTime.UtcNow,
+                },
+                new ParentChildLineStats
+                {
+                    Id = 0,
+                    ParentId = customer.Id,
+                    ParentEmail = customer.Email,
+                    LineLevel = "3",
+                    ChildCount = 0,
+                    CreatedDateTimeUtc = DateTime.UtcNow,
+                    LastUpdatedTimeUtc = DateTime.UtcNow,
+                },
+                new ParentChildLineStats
+                {
+                    Id = 0,
+                    ParentId = customer.Id,
+                    ParentEmail = customer.Email,
+                    LineLevel = "4",
+                    ChildCount = 0,
+                    CreatedDateTimeUtc = DateTime.UtcNow,
+                    LastUpdatedTimeUtc = DateTime.UtcNow,
+                }
+            };
+        }
+
+        var today = DateTime.Now;
+        int year = today.Month == 1 ? today.Year - 1 : today.Year;
+        int month = today.Month == 1 ? 12 : today.Month - 1;
+
+        var sumOrder = await _parentChildSumOrderStatsService.GetParentChildSumOrderStatsAsync(customer.Id, year, month);
+        if (sumOrder == null)
+        {
+            sumOrder = new ParentChildSumOrderStats { 
+                Id = 0,
+                ParentId = 0,
+                ParentEmail = "",
+                Year = DateTime.Now.Year,
+                Month = DateTime.Now.Month,
+                CurrencyCode = "",
+                CurrencyRate = 0,
+                TotalOrderAmount = 0.00m,
+                TotalOrderCount = 0,
+                CreatedDateTimeUtc = DateTime.UtcNow,
+                LastUpdatedTimeUtc = DateTime.UtcNow,
+                IsPaid = false,
+                PayAmount = 0.00m,
+            };
+        }
+
+        model.ParentChildLineStatsModel = stats;
+        model.ParentChildSumOrderStatsModel = sumOrder;
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public virtual async Task<IActionResult> Info1(string email, string modelUsername, string modelEmail)
+    {
+        try
+        {
+            // Validate email is null or empty
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Json(new { error = "Email is required." });
+            }
+
+            // Validate email pattern
+            var emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            if (!Regex.IsMatch(email, emailPattern))
+            {
+                return Json(new { error = "Invalid email format." });
+            }
+
+            // Validate cannot add yourself as child
+            if (email.Equals(modelEmail))
+            {
+                return Json(new { error = "Adding yourself as a (Line 2) downline is not allowed." });
+            }
+
+            var customer = await _customerService.GetCustomerByEmailAsync(email);
+
+            if (customer == null)
+            {
+                return Json(new { error = "User not exist. Please contact the user to register." });
+            }
+
+            // One parent (line 1) can have multiple children, but a child can only be registered once.
+            if (await _parentChildRelationsService.IsChildAlreadyRegisteredAsync(customer.Id))
+            {
+                return Json(new { error = "This child has already been registered under another parent." });
+            }
+
+            // Parent (line 1) cannot add another parent (line 1) as a child.
+            if (await _parentChildRelationsService.IsChildAlsoAParentAsync(email))
+            {
+                return Json(new { error = "You cannot add another parent as your child." });
+            }
+
+            // Child (line 2) cannot add parent (line 1) as their child.
+            if (await _parentChildRelationsService.IsChildTryingToAddParentAsync(email, modelEmail))
+            {
+                return Json(new { error = "A child is not allowed to add a parent as their downline." });
+            }
+
+
+            var modelCustomer = new Customer();
+            if (string.IsNullOrEmpty(modelUsername))
+                modelCustomer = await _customerService.GetCustomerByEmailAsync(modelEmail);
+            else
+                modelCustomer = await _customerService.GetCustomerByUsernameAndEmailAsync(modelUsername, modelEmail);
+
+            var parentChildRelations = new ParentChildRelations
+            {
+                ParentId = modelCustomer.Id,
+                ParentEmail = modelEmail,
+                ChildId = customer.Id,
+                ChildEmail = customer.Email,
+                CreatedDateTimeUtc = DateTime.UtcNow,
+            };
+
+            var insertedId = await _parentChildRelationsService.InsertParentChildRelationsAsync(parentChildRelations);
+
+            if (insertedId > 0)
+            {
+                return Json(new
+                {
+                    message = "You had successfully added your new (Line 2) downline."
+                    //redirect = Url.RouteUrl("CustomerInfo1")
+                });
+            }
+            else
+            {
+                return Json(new { error = "Unsuccessfully added your new (Line 2) downline. Please contact admin." });
+            }
+        }
+        catch (Exception ex)
+        {
+            return Json(new { error = ex.Message });
+        }
+    }
+
+
 
     [HttpPost]
     public virtual async Task<IActionResult> RemoveExternalAssociation(int id)
