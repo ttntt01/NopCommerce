@@ -80,6 +80,15 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
             pattern: $"{lang}/customer/info",
             defaults: new { controller = "Customer", action = "Info" });
 
+
+
+        endpointRouteBuilder.MapControllerRoute(name: "CustomerInfo1",
+            pattern: $"{lang}/customer/info1",
+            defaults: new { controller = "Customer", action = "Info1" });
+
+
+
+
         endpointRouteBuilder.MapControllerRoute(name: "CustomerAddresses",
             pattern: $"{lang}/customer/addresses",
             defaults: new { controller = "Customer", action = "Addresses" });

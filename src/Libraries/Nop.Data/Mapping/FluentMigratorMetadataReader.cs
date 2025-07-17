@@ -95,8 +95,23 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
 
         var attribute = Types.GetOrAdd((type, memberInfo), _ =>
         {
+            //var matchingFields = entityDescriptor.Fields
+            //        .Where(cd => cd.Name.Equals(NameCompatibilityManager.GetColumnName(type, memberInfo.Name), StringComparison.OrdinalIgnoreCase))
+            //        .ToList();
+
+
+            //if (matchingFields.Count > 1)
+            //{
+            //    foreach (var field in entityDescriptor.Fields)
+            //    {
+            //        Console.WriteLine($"Field: {field.Name}");
+            //    }
+
+            //    throw new InvalidOperationException($"Duplicate column mapping for `{memberInfo.Name}` in `{type.FullName}`. Matches: {string.Join(", ", matchingFields.Select(f => f.Name))}");
+            //}
 
             var entityField = entityDescriptor.Fields.SingleOrDefault(cd => cd.Name.Equals(NameCompatibilityManager.GetColumnName(type, memberInfo.Name), StringComparison.OrdinalIgnoreCase));
+            //var entityField = entityDescriptor.Fields.FirstOrDefault(cd => cd.Name.Equals(NameCompatibilityManager.GetColumnName(type, memberInfo.Name), StringComparison.OrdinalIgnoreCase));
 
             if (entityField is null)
                 return null;

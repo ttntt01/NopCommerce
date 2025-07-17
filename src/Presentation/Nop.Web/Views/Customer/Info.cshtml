@@ -355,6 +355,7 @@
                     </div>
                 </div>
             }
+            @* Commented by kee - not using
             @if (Model.NumberOfExternalAuthenticationProviders > 0)
             {
                 <div class="fieldset">
@@ -415,6 +416,7 @@
                             </table>
                         </div>
                     }
+                    
                     @if (Model.NumberOfExternalAuthenticationProviders > Model.AssociatedExternalAuthRecords.Count)
                     {
                         //we can add more external records
@@ -425,7 +427,7 @@
                         </div>
                     }
                 </div>
-            }
+            } *@
 
             @if (Model.GdprConsents.Count > 0)
             {

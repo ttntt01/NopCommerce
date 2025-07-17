@@ -3470,6 +3470,7 @@ namespace Nop.Services.Installation
                     "/customer/checkusernameavailability",
                     "/customer/downloadableproducts",
                     "/customer/info",
+                    "/customer/info1",
                     "/customer/productreviews",
                     "/deletepm",
                     "/emailwishlist",

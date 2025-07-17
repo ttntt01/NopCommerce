@@ -354,6 +354,17 @@ public partial interface ICustomerService
     /// </returns>
     Task<Guid[]> GetNotExistingCustomersAsync(Guid[] guids);
 
+
+    /// <summary>
+    /// Get customer by username and email
+    /// </summary>
+    /// <param name="username">Username</param>
+    /// <param name="email">Email</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the customer
+    /// </returns>
+    Task<Customer> GetCustomerByUsernameAndEmailAsync(string username, string email);
     #endregion
 
     #region Customer roles

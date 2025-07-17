@@ -39,7 +39,9 @@ public partial class BaseNameCompatibility : INameCompatibility
         { typeof(ForumSubscription), "Forums_Subscription" },
         { typeof(ForumTopic), "Forums_Topic" },
         { typeof(PrivateMessage), "Forums_PrivateMessage" },
-        { typeof(NewsItem), "News" }
+        { typeof(NewsItem), "News" },
+        { typeof(ParentChildRelations), "ParentChildRelations" },
+        { typeof(ParentChildLineStats), "ParentChildLineStats" }
     };
 
     public Dictionary<(Type, string), string> ColumnName => new()
