@@ -27,6 +27,9 @@ public partial class NopStartup : INopStartup
         services.AddScoped<ILocalizedModelFactory, LocalizedModelFactory>();
         services.AddScoped<IStoreMappingSupportedModelFactory, StoreMappingSupportedModelFactory>();
 
+        //commission factories
+        services.AddScoped<ICommissionModelFctory, CommissionModelFctory>();
+
         //admin factories
         services.AddScoped<IBaseAdminModelFactory, BaseAdminModelFactory>();
         services.AddScoped<IActivityLogModelFactory, ActivityLogModelFactory>();
@@ -82,6 +85,7 @@ public partial class NopStartup : INopStartup
         services.AddScoped<IVendorAttributeModelFactory, VendorAttributeModelFactory>();
         services.AddScoped<IVendorModelFactory, VendorModelFactory>();
         services.AddScoped<Areas.Admin.Factories.IWidgetModelFactory, Areas.Admin.Factories.WidgetModelFactory>();
+        services.AddScoped<ICommissionModelFctory, CommissionModelFctory>();
 
         //factories
         services.AddScoped<Factories.IAddressModelFactory, Factories.AddressModelFactory>();
@@ -105,7 +109,7 @@ public partial class NopStartup : INopStartup
         services.AddScoped<Factories.IShoppingCartModelFactory, Factories.ShoppingCartModelFactory>();
         services.AddScoped<Factories.ISitemapModelFactory, Factories.SitemapModelFactory>();
         services.AddScoped<Factories.ITopicModelFactory, Factories.TopicModelFactory>();
-        services.AddScoped<Factories.IVendorModelFactory, Factories.VendorModelFactory>();
+        services.AddScoped<Factories.IVendorModelFactory, Factories.VendorModelFactory>();        
 
         //helpers classes
         services.AddScoped<ITinyMceHelper, TinyMceHelper>();

@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Nop.Core.Domain.Customers;
-using Nop.Services.Common;
 using Nop.Services.ParentChild;
 using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Catalog;
-using Nop.Web.Areas.Admin.Models.Common;
-using Nop.Web.Areas.Admin.Models.Home;
+using Nop.Web.Areas.Admin.Models.Commission;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
@@ -14,7 +11,8 @@ public partial class CommissionController : BaseAdminController
 {
     #region Fields
 
-    protected readonly IProductModelFactory _productModelFactory;
+    protected readonly IPermissionService _permissionService;
+    protected readonly ICommissionModelFctory _commissionModelFctory;
     protected readonly IParentChildSumOrderStatsService _parentChildSumOrderStatsService;
 
     #endregion
@@ -22,9 +20,10 @@ public partial class CommissionController : BaseAdminController
 
     #region Ctor
 
-    public CommissionController(IProductModelFactory productModelFactory, IParentChildSumOrderStatsService parentChildSumOrderStatsService)
+    public CommissionController(IPermissionService permissionService, ICommissionModelFctory commissionModelFctory, IParentChildSumOrderStatsService parentChildSumOrderStatsService)
     {
-        _productModelFactory = productModelFactory;
+        _permissionService = permissionService;
+        _commissionModelFctory = commissionModelFctory;
         _parentChildSumOrderStatsService = parentChildSumOrderStatsService;
     }
 
@@ -36,9 +35,27 @@ public partial class CommissionController : BaseAdminController
     public virtual async Task<IActionResult> Index()
     {    
         //prepare model
-        var model = await _productModelFactory.PrepareProductTagSearchModelAsync(new ProductTagSearchModel());
+        var model = await _commissionModelFctory.PrepareCommissionSearchModelAsync(new CommissionSearchModel());
 
         return View(model);
+    }
+
+    [HttpPost]
+    public virtual async Task<IActionResult> ParentChildSumOrderStatsList(CommissionSearchModel searchModel)
+    {
+        if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageProducts))
+            return await AccessDeniedDataTablesJson();
+
+        if (searchModel.Year.Equals(0))
+            searchModel.Year = DateTime.Now.Year;
+
+        if (searchModel.Month.Equals(0))    
+            searchModel.Month = DateTime.Now.Month;
+
+        //prepare model
+        var model = await _commissionModelFctory.PrepareParentChildSumOrderStatsListModelAsync(searchModel);
+
+        return Json(model);
     }
 
     #endregion

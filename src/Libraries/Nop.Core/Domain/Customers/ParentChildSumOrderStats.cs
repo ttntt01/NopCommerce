@@ -61,4 +61,14 @@ public partial class ParentChildSumOrderStats : BaseEntity
     /// Gets or sets the PayAmount
     /// </summary>
     public decimal PayAmount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ExecuteStartDateTime
+    /// </summary>
+    public DateTime ExecuteStartDateTime { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ExecuteEndDateTime
+    /// </summary>
+    public DateTime ExecuteEndDateTime { get; set; }
 }

@@ -1,32 +1,46 @@
-﻿@model ProductTagSearchModel
+﻿@using Nop.Web.Areas.Admin.Models.Commission
+@model Nop.Web.Areas.Admin.Models.Commission.CommissionSearchModel
 
 @{
     //page title
-    ViewBag.PageTitle = T("Admin.Catalog.ProductTags").Text;
+    ViewBag.PageTitle = T("Admin.Commission").Text;
     //active menu item (system name)
-    NopHtml.SetActiveMenuItemSystemName("Product tags");
+    NopHtml.SetActiveMenuItemSystemName("Comission");
 }
 
 @{
-    const string hideSearchBlockAttributeName = "ManufacturersPage.HideSearchBlock";
+    const string hideSearchBlockAttributeName = "CommissionPage.HideSearchBlock";
     var hideSearchBlock = await genericAttributeService.GetAttributeAsync<bool>(await workContext.GetCurrentCustomerAsync(), hideSearchBlockAttributeName);
 }
 
 <form asp-controller="Product" asp-action="ProductTags" method="post" id="product-tags-form">
     <div class="content-header clearfix">
         <h1 class="float-left">
-            @T("Admin.Catalog.ProductTags")
+            @T("Admin.Commission")
         </h1>
         <div class="float-right">
             &nbsp;
-            @await Component.InvokeAsync(typeof(AdminWidgetViewComponent), new { widgetZone = AdminWidgetZones.ProductTagListButtons, additionalData = Model })
-            <button type="button" id="delete-selected" class="btn btn-danger">
-                <i class="far fa-trash-alt"></i>
-                @T("Admin.Common.Delete.Selected")
-            </button>
-            <nop-action-confirmation asp-button-id="delete-selected" />
+            @await Component.InvokeAsync(typeof(AdminWidgetViewComponent), new { widgetZone = AdminWidgetZones.ProductTagListButtons, additionalData = Model })            
         </div>
     </div>
+
+    <script>
+        function renderDate(data, type, row) {
+            if (!data) return '';
+
+            const date = new Date(data);
+            const pad = n => n.toString().padStart(2, '0');
+
+            const year = date.getFullYear();
+            const month = pad(date.getMonth() + 1);
+            const day = pad(date.getDate());
+            const hours = pad(date.getHours());
+            const minutes = pad(date.getMinutes());
+            const seconds = pad(date.getSeconds());
+
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+    </script>
 
     <section class="content">
         <div class="container-fluid">
@@ -39,22 +53,49 @@
                                 <div class="icon-search"><i class="fas fa-search" aria-hidden="true"></i></div>
                                 <div class="icon-collapse"><i class="far fa-angle-@(!hideSearchBlock ? "up" : "down")" aria-hidden="true"></i></div>
                             </div>
+
                             <div class="search-body @(hideSearchBlock ? "closed" : "")">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <div class="form-group row">
                                             <div class="col-md-4">
-                                                
+                                                <nop-label asp-for="Year" />
                                             </div>
                                             <div class="col-md-8">
-                                                
+                                                <nop-editor asp-for="Year" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-md-4">
+                                                <nop-label asp-for="Month" />
+                                            </div>
+                                            <div class="col-md-8">
+                                                <nop-editor asp-for="Month" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="form-group row">
+                                            <div class="col-md-4">
+                                                <nop-label asp-for="ParentEmail" />
+                                            </div>
+                                            <div class="col-md-8">
+                                                <nop-editor asp-for="ParentEmail" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-md-4">
+                                                <nop-label asp-for="SelectedIsPaid" />
+                                            </div>
+                                            <div class="col-md-8">
+                                                <nop-select asp-for="SelectedIsPaid" asp-items="Model.IsPaidList" />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="text-center col-12">
-                                        <button type="button" id="search-product-tags" class="btn btn-primary btn-search">
+                                        <button type="button" id="search-commission" class="btn btn-primary btn-search">
                                             <i class="fas fa-search"></i>
                                             @T("Admin.Common.Search")
                                         </button>
@@ -67,11 +108,97 @@
                 <div class="cards-group">
                     <div class="card card-default">
                         <div class="card-body">
-                            <nop-doc-reference asp-string-resource="@T("Admin.Documentation.Reference.ProductTags", Docs.ProductTags + Utm.OnAdmin)" />
-
-
-                            <nop-alert asp-alert-id="deleteSelectedFailed" />
-                            <nop-alert asp-alert-id="nothingSelectedAlert" />
+                            @await Html.PartialAsync("Table", new DataTablesModel
+                            {
+                                Name = "commission-grid",
+                                UrlRead = new DataUrl("ParentChildSumOrderStatsList", "Commission", null),
+                                SearchButtonId = "search-commission",
+                                Length = Model.PageSize,
+                                LengthMenu = Model.AvailablePageSizes,
+                                Filters = new List<FilterParameter>
+                                {
+                                    new FilterParameter(nameof(Model.Year)),
+                                    new FilterParameter(nameof(Model.Month)),
+                                    new FilterParameter(nameof(Model.ParentEmail)),
+                                    new FilterParameter(nameof(Model.SelectedIsPaid))
+                                },
+                                ColumnCollection = new List<ColumnProperty>
+                                {
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.Id))
+                                    {
+                                        IsMasterCheckBox = true,
+                                        Render = new RenderCheckBox("checkbox_comission"),
+                                        ClassName =  NopColumnClassDefaults.CenterAll,
+                                        Width = "50"
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.ParentEmail))
+                                    {
+                                        Title = T("Admin.Comission.ParentEmail").Text,
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.Year))
+                                    {
+                                        Title = T("Admin.Comission.Year").Text
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.Month))
+                                    {
+                                        Title = T("Admin.Comission.Month").Text,                                    
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.CurrencyCode))
+                                    {
+                                        Title = T("Admin.Comission.CurrencyCode").Text,
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.CurrencyRate))
+                                    {
+                                        Title = T("Admin.Comission.CurrencyRate").Text
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.TotalOrderAmount))
+                                    {
+                                        Title = T("Admin.Comission.TotalOrderAmount").Text,
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.TotalOrderCount))
+                                    {
+                                        Title = T("Admin.Comission.TotalOrderCount").Text,
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.CreatedDateTimeUtc))
+                                    {
+                                        Title = T("Admin.Comission.CreatedDateTimeUtc").Text,
+                                        Render = new RenderCustom("renderDate")
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.LastUpdatedTimeUtc))
+                                    {
+                                        Title = T("Admin.Comission.LastUpdatedTimeUtc").Text,
+                                        Render = new RenderCustom("renderDate")
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.IsPaid))
+                                    {
+                                        Title = T("Admin.Comission.IsPaid").Text,
+                                        Width = "80",
+                                        ClassName = NopColumnClassDefaults.CenterAll,
+                                        Render = new RenderBoolean()
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.PayAmount))
+                                    {
+                                        Title = T("Admin.Comission.PayAmount").Text,
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.ExecuteStartDateTime))
+                                    {
+                                        Title = T("Admin.Comission.ExecuteStartDateTime").Text,
+                                        Render = new RenderCustom("renderDate")
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.ExecuteEndDateTime))
+                                    {
+                                        Title = T("Admin.Comission.ExecuteEndDateTime").Text,
+                                        Render = new RenderCustom("renderDate")
+                                    },
+                                    new ColumnProperty(nameof(ParentChildSumOrderStatsModel.Id))
+                                    {
+                                        Title = T("Admin.Common.Edit").Text,
+                                        Width = "80",
+                                        ClassName =  NopColumnClassDefaults.Button,
+                                        Render = new RenderButtonEdit(new DataUrl("Edit"))
+                                    }    
+                                }
+                            })
                         </div>
                     </div>
                 </div>

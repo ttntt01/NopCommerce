@@ -17,6 +17,7 @@ using Nop.Services.Blogs;
 using Nop.Services.Caching;
 using Nop.Services.Catalog;
 using Nop.Services.Cms;
+using Nop.Services.Commission;
 using Nop.Services.Common;
 using Nop.Services.Configuration;
 using Nop.Services.Customers;
@@ -238,6 +239,7 @@ public partial class NopStartup : INopStartup
         services.AddScoped<IParentChildRelationsService, ParentChildRelationsService>();
         services.AddScoped<IParentChildLineStatsService, ParentChildLineStatsService>();
         services.AddScoped<IParentChildSumOrderStatsService, ParentChildSumOrderStatsService>();
+        services.AddScoped<ICommissionService, CommissionService>();
 
 
         //attribute services
