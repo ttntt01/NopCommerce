@@ -45,8 +45,8 @@
 
 <script type="text/javascript">
     const now = new Date();
-    let year = now.getFullYear();
-    let month = now.getMonth(); // 0-based, so 0 = January
+    let year1 = now.getFullYear();
+    let month1 = now.getMonth(); // 0-based, so 0 = January
 
     if (month === 0) {
         // If January, go to December of previous year
@@ -54,8 +54,8 @@
         year -= 1;
     }
 
-    const formattedMonth = String(month).padStart(2, '0');
-    document.getElementById('salary-month').innerText = `${year}/${formattedMonth}`;
+    const formattedMonth = String(month1).padStart(2, '0');
+    document.getElementById('salary-month').innerText = `${year1}/${formattedMonth}`;
 </script>
 
 <div class="page account-page customer-info-page">
@@ -73,12 +73,12 @@
                     <strong>Your commission</strong>
                     </br>
                         <label style="color:red; font-size: 13px">
-                            * Commission will be updated by the end of the month:
+                            * Commission will be updated by every end of the month:
                             <span style="color:#777777; font-weight: bold; font-style: italic" id="lastDay-month"></span>
                         </label>
                     </br>
                         <label style="color:red; font-size: 13px">
-                            * Commission will be paid within the first 5 working days of the following month.
+                            * Commissions for the previous month will be paid within the first 5 working business days of this month.
                         </label>
                     </br>
                         <label style="color:red; font-size: 13px">
