@@ -195,10 +195,11 @@
                                         Title = T("Admin.Common.Edit").Text,
                                         Width = "80",
                                         ClassName =  NopColumnClassDefaults.Button,
-                                        Render = new RenderButtonEdit(new DataUrl("Edit"))
+                                        //Render = new RenderButtonEdit(new DataUrl("Edit", "Commission", new RouteValueDictionary { { "area", "Admin" }, { "id", "__id__" } }))
+                                        Render = new RenderButtonEdit(new DataUrl("/Admin/Commission/Edit/"))
                                     }    
                                 }
-                            })
+                            })                            
                         </div>
                     </div>
                 </div>

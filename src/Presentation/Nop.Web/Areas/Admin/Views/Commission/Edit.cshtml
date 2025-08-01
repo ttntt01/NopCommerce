@@ -1,0 +1,184 @@
+@model Nop.Web.Areas.Admin.Models.Commission.ParentChildSumOrderStatsModel
+
+@{
+    //page title
+    ViewBag.PageTitle = T("Admin.Commission").Text;
+    //active menu item (system name)
+    NopHtml.SetActiveMenuItemSystemName("Comission");
+}
+
+<form asp-controller="Commission" asp-action="Update" method="post">
+    <div class="content-header clearfix">
+        <h1 class="float-left">   
+            @T("Admin.Comission.EditComissionDetails") - @Model.ParentEmail
+            <small>
+                <i class="fas fa-arrow-circle-left"></i>
+                <a asp-action="Index">@T("Admin.Comission.BackToList")</a>
+            </small>
+        </h1>
+    </div>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="form-horizontal">
+                <div class="cards-group">
+                    @await Component.InvokeAsync(typeof(AdminWidgetViewComponent), new { widgetZone = AdminWidgetZones.CustomerRoleDetailsTop, additionalData = Model })
+                    <div class="card card-default">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="Id" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="Id" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="Id"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="ParentId" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="ParentId" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="ParentId"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="ParentEmail" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="ParentEmail" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="ParentEmail"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="Year" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="Year" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="Year"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="Month" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="Month" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="Month"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="CurrencyCode" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="CurrencyCode" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="CurrencyCode"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="CurrencyRate" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="CurrencyRate" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="CurrencyRate"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="TotalOrderAmount" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="TotalOrderAmount" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="TotalOrderAmount"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="TotalOrderCount" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="TotalOrderCount" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="TotalOrderCount"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="CreatedDateTimeUtc" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="CreatedDateTimeUtc" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="CreatedDateTimeUtc"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="LastUpdatedTimeUtc" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="LastUpdatedTimeUtc" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="LastUpdatedTimeUtc"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="ExecuteStartDateTime" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="ExecuteStartDateTime" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="ExecuteStartDateTime"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="ExecuteEndDateTime" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="ExecuteEndDateTime" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="ExecuteEndDateTime"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="PayAmount" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="PayAmount" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="PayAmount"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="Status" />
+                                </div>
+                                <div class="col-md-9">
+                                    <input asp-for="Status" readonly style="width:100%; height:calc(2.25rem + 2px); padding:.375rem .75rem; background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border: 1px solid transparent; box-shadow: none;" />
+                                    <span asp-validation-for="Status"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="IsPaid" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="IsPaid" />
+                                    <span asp-validation-for="IsPaid"></span>                                    
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="submit" name="commission-update" class="btn btn-primary" style="float: right; @(Model.IsPaid ? "background-color: #d6d6d6; border-color: #d6d6d6; color: #999; cursor: not-allowed;" : "")"
+                                    @(Model.IsPaid ? "disabled" : "")>
+                                        <i class="far fa-save"></i>
+                                        @T("Admin.Commission.Update")
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>        
+</form>

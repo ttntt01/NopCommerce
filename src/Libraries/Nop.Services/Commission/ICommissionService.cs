@@ -24,4 +24,25 @@ public partial interface ICommissionService
     /// </returns>
     Task<IPagedList<ParentChildSumOrderStats>> SearchParentChildSumOrderStatsAsync(int year, int month, string parentEmail, bool? isPaid, 
         int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false);
+
+    /// <summary>
+    /// Prepare parent child sum order stats model
+    /// </summary>
+    /// <param name="id">Id search</param>    
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the parent child sum order stats model
+    /// </returns>
+    Task<ParentChildSumOrderStats> PrepareParentChildSumOrderStatsModelAsync(int id);
+
+    /// <summary>
+    /// Update commission paid
+    /// </summary>
+    /// <param name="parentChildSumOrderStats">Parent Child Sum Order Stats identifiers</param>
+    /// </param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// Parameters contains the parent child sum order stats
+    /// </returns>
+    Task<ParentChildSumOrderStats> UpdateIsPaidStatusAsync(ParentChildSumOrderStats parentChildSumOrderStats);
 }

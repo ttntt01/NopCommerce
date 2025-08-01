@@ -1,4 +1,5 @@
-﻿using Nop.Web.Areas.Admin.Models.Commission;
+﻿using Nop.Core.Domain.Customers;
+using Nop.Web.Areas.Admin.Models.Commission;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -17,7 +18,7 @@ public partial interface ICommissionModelFctory
     /// </returns>
     Task<CommissionSearchModel> PrepareCommissionSearchModelAsync(CommissionSearchModel searchModel);
 
-
+    /// <summary>
     /// Prepare paged parent child sum order stats list model
     /// </summary>
     /// <param name="searchModel">ParentChildSumOrderStats search model</param>
@@ -26,4 +27,25 @@ public partial interface ICommissionModelFctory
     /// The task result contains the parent child sum order stats list model
     /// </returns>
     Task<ParentChildSumOrderStatsListModel> PrepareParentChildSumOrderStatsListModelAsync(CommissionSearchModel searchModel);
+
+    /// <summary>
+    /// Prepare parent child sum order stats model
+    /// </summary>
+    /// <param name="id">Id search</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the parent child sum order stats model
+    /// </returns>
+    Task<ParentChildSumOrderStats> PrepareParentChildSumOrderStatsModelAsync(int id);
+
+    /// <summary>
+    /// Update commission paid
+    /// </summary>
+    /// <param name="parentChildSumOrderStats">Parent Child Sum Order Stats identifiers</param>
+    /// </param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// Parameters contains the parent child sum order stats
+    /// </returns>
+    Task<ParentChildSumOrderStats> UpdateIsPaidStatusAsync(ParentChildSumOrderStats parentChildSumOrderStats);
 }

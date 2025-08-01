@@ -37,5 +37,7 @@ public partial record ParentChildSumOrderStatsModel : BaseNopEntityModel
 
     public DateTime ExecuteEndDateTime {  get; set; }
 
+    public string Status { get; set; }
+
     #endregion
 }

@@ -1,4 +1,5 @@
-﻿using Nop.Core;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Localization;
 using Nop.Data;
@@ -74,5 +75,39 @@ public partial class CommissionService : ICommissionService
         return parentChildSumOrderStats; 
     }
 
+
+    /// <summary>
+    /// Prepare parent child sum order stats model
+    /// </summary>
+    /// <param name="id">Id search</param>    
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the parent child sum order stats model
+    /// </returns>
+    public virtual async Task<ParentChildSumOrderStats> PrepareParentChildSumOrderStatsModelAsync(int id)
+    { 
+        var parentChildSumOrderStats = await _parentChildSumOrderStatsRepository.GetByIdAsync(id);
+
+        return parentChildSumOrderStats;
+    }
+
+
+    /// <summary>
+    /// Update commission paid
+    /// </summary>
+    /// <param name="parentChildSumOrderStats">Parent Child Sum Order Stats identifiers</param>
+    /// </param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// Parameters contains the parent child sum order stats
+    /// </returns>
+    public virtual async Task<ParentChildSumOrderStats> UpdateIsPaidStatusAsync(ParentChildSumOrderStats parentChildSumOrderStats)
+    {
+        await _parentChildSumOrderStatsRepository.UpdateAsync(parentChildSumOrderStats);
+
+        var result = await _parentChildSumOrderStatsRepository.GetByIdAsync(parentChildSumOrderStats.Id);
+
+        return result;
+    }
     #endregion
 }
