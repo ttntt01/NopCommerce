@@ -234,6 +234,7 @@ public partial class NopStartup : INopStartup
         services.AddScoped<IBBCodeHelper, BBCodeHelper>();
         services.AddScoped<IHtmlFormatter, HtmlFormatter>();
         services.AddScoped<IVideoService, VideoService>();
+        services.AddScoped<IFileService, FileService>();
         services.AddScoped<INopUrlHelper, NopUrlHelper>();
         services.AddScoped<IWidgetModelFactory, WidgetModelFactory>();
         services.AddScoped<IParentChildRelationsService, ParentChildRelationsService>();

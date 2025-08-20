@@ -16,10 +16,12 @@ public partial record ProductModel : BaseNopEntityModel,
 
     public ProductModel()
     {
+        ProductFileModels = new List<ProductFileModel>();
         ProductPictureModels = new List<ProductPictureModel>();
         ProductVideoModels = new List<ProductVideoModel>();
         Locales = new List<ProductLocalizedModel>();
         CopyProductModel = new CopyProductModel();
+        AddFileModel = new ProductFileModel();
         AddPictureModel = new ProductPictureModel();
         AddVideoModel = new ProductVideoModel();
         ProductWarehouseInventoryModels = new List<ProductWarehouseInventoryModel>();
@@ -58,6 +60,7 @@ public partial record ProductModel : BaseNopEntityModel,
         RelatedProductSearchModel = new RelatedProductSearchModel();
         CrossSellProductSearchModel = new CrossSellProductSearchModel();
         AssociatedProductSearchModel = new AssociatedProductSearchModel();
+        ProductFileSearchModel = new ProductFileSearchModel();
         ProductPictureSearchModel = new ProductPictureSearchModel();
         ProductVideoSearchModel = new ProductVideoSearchModel();
         ProductSpecificationAttributeSearchModel = new ProductSpecificationAttributeSearchModel();
@@ -436,6 +439,10 @@ public partial record ProductModel : BaseNopEntityModel,
     public ProductVideoModel AddVideoModel { get; set; }
     public IList<ProductVideoModel> ProductVideoModels { get; set; }
 
+    //files
+    public ProductFileModel AddFileModel { get; set; }
+    public IList<ProductFileModel> ProductFileModels { get; set; }
+
     //product attributes
     public bool ProductAttributesExist { get; set; }
     public bool CanCreateCombinations { get; set; }
@@ -461,6 +468,8 @@ public partial record ProductModel : BaseNopEntityModel,
     public CrossSellProductSearchModel CrossSellProductSearchModel { get; set; }
 
     public AssociatedProductSearchModel AssociatedProductSearchModel { get; set; }
+
+    public ProductFileSearchModel ProductFileSearchModel { get; set; }
 
     public ProductPictureSearchModel ProductPictureSearchModel { get; set; }
 

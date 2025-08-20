@@ -29,7 +29,7 @@ public partial class PictureService : IPictureService
     protected readonly IProductAttributeService _productAttributeService;
     protected readonly IRepository<Picture> _pictureRepository;
     protected readonly IRepository<PictureBinary> _pictureBinaryRepository;
-    protected readonly IRepository<ProductPicture> _productPictureRepository;
+    protected readonly IRepository<ProductPicture> _productPictureRepository;    
     protected readonly ISettingService _settingService;
     protected readonly IUrlRecordService _urlRecordService;
     protected readonly IWebHelper _webHelper;
@@ -47,7 +47,7 @@ public partial class PictureService : IPictureService
         IProductAttributeService productAttributeService,
         IRepository<Picture> pictureRepository,
         IRepository<PictureBinary> pictureBinaryRepository,
-        IRepository<ProductPicture> productPictureRepository,
+        IRepository<ProductPicture> productPictureRepository,        
         ISettingService settingService,
         IUrlRecordService urlRecordService,
         IWebHelper webHelper,
@@ -61,7 +61,7 @@ public partial class PictureService : IPictureService
         _productAttributeService = productAttributeService;
         _pictureRepository = pictureRepository;
         _pictureBinaryRepository = pictureBinaryRepository;
-        _productPictureRepository = productPictureRepository;
+        _productPictureRepository = productPictureRepository;        
         _settingService = settingService;
         _urlRecordService = urlRecordService;
         _webHelper = webHelper;

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using DocumentFormat.OpenXml.EMMA;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Nop.Core;
@@ -73,6 +74,7 @@ public partial class ProductController : BaseAdminController
     protected readonly IStoreContext _storeContext;
     protected readonly IUrlRecordService _urlRecordService;
     protected readonly IVideoService _videoService;
+    protected readonly IFileService _fileService;
     protected readonly IWebHelper _webHelper;
     protected readonly IWorkContext _workContext;
     protected readonly VendorSettings _vendorSettings;
@@ -116,6 +118,7 @@ public partial class ProductController : BaseAdminController
         IStoreContext storeContext,
         IUrlRecordService urlRecordService,
         IVideoService videoService,
+        IFileService fileService,
         IWebHelper webHelper,
         IWorkContext workContext,
         VendorSettings vendorSettings)
@@ -154,6 +157,7 @@ public partial class ProductController : BaseAdminController
         _storeContext = storeContext;
         _urlRecordService = urlRecordService;
         _videoService = videoService;
+        _fileService = fileService;
         _webHelper = webHelper;
         _workContext = workContext;
         _vendorSettings = vendorSettings;
@@ -1689,6 +1693,108 @@ public partial class ProductController : BaseAdminController
     }
 
     #endregion
+
+
+    #region Product File
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public virtual async Task<IActionResult> ProductFileAdd(int productId, IFormCollection form)
+    {
+        if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageProducts))
+            return AccessDeniedView();
+
+        if (productId == 0)
+            throw new ArgumentException();
+
+        //try to get a product with the specified id
+        var product = await _productService.GetProductByIdAsync(productId)
+            ?? throw new ArgumentException("No product found with the specified id");
+
+        var files = form.Files.ToList();
+        if (!files.Any())
+            return Json(new { success = false });
+
+        //a vendor should have access only to his products
+        var currentVendor = await _workContext.GetCurrentVendorAsync();
+        if (currentVendor != null && product.VendorId != currentVendor.Id)
+            return RedirectToAction("List");
+        try
+        {
+            foreach (var file in files)
+            {
+                //insert file
+                var f = await _fileService.InsertFileAsync(file);
+
+                //await _fileService.SetSeoFilenameAsync(picture.Id, await _pictureService.GetPictureSeNameAsync(product.Name));
+
+                await _productService.InsertProductFileAsync(new ProductFile
+                {
+                    Id = f.Id,
+                    ProductId = product.Id,
+                    IsNew = true,
+                    CreatedDateTimeUTC = DateTime.UtcNow,
+                });
+            }
+        }
+        catch (Exception exc)
+        {
+            return Json(new
+            {
+                success = false,
+                message = $"{await _localizationService.GetResourceAsync("Admin.Catalog.Products.Multimedia.Files.Alert.FileAdd")} {exc.Message}",
+            });
+        }
+
+        return Json(new { success = true });
+    }
+
+    [HttpPost]
+    public virtual async Task<IActionResult> ProductFileList(ProductFileSearchModel searchModel)
+    {
+        if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageProducts))
+            return await AccessDeniedDataTablesJson();
+
+        //try to get a product with the specified id
+        var product = await _productService.GetProductByIdAsync(searchModel.ProductId)
+            ?? throw new ArgumentException("No product found with the specified id");
+
+        //a vendor should have access only to his products
+        var currentVendor = await _workContext.GetCurrentVendorAsync();
+        if (currentVendor != null && product.VendorId != currentVendor.Id)
+            return Content("This is not your product");
+
+        //prepare model
+        var model = await _productModelFactory.PrepareProductFileListModelAsync(searchModel, product);
+
+        return Json(model);
+    }
+
+    [HttpPost]
+    public virtual async Task<IActionResult> ProductFileDelete(int id)
+    {
+        if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageProducts))
+            return await AccessDeniedDataTablesJson();
+
+        //try to get a product picture with the specified id
+        var productPicture = await _productService.GetProductPictureByIdAsync(id)
+            ?? throw new ArgumentException("No product picture found with the specified id");
+
+        //a vendor should have access only to his products
+        var currentVendor = await _workContext.GetCurrentVendorAsync();
+        if (currentVendor != null)
+        {
+            var product = await _productService.GetProductByIdAsync(productPicture.ProductId);
+            if (product != null && product.VendorId != currentVendor.Id)
+                return Content("This is not your product");
+        }
+
+        await _fileService.DeleteFileAsync(id);
+
+        return new NullJsonResult();
+    }
+
+    #endregion
+
 
     #region Product pictures
 

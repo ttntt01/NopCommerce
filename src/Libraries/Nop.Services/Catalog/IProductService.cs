@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Discounts;
+using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
@@ -655,7 +656,17 @@ public partial interface IProductService
     /// </summary>
     /// <param name="productPicture">Product picture</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    Task DeleteProductPictureAsync(ProductPicture productPicture);
+    Task DeleteProductPictureAsync(ProductPicture productPicture);  
+
+    /// <summary>
+    /// Gets a product file by product identifier
+    /// </summary>
+    /// <param name="productId">The product identifier</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the product file
+    /// </returns>
+    Task<IList<ProductFile>> GetProductFileByProductIdAsync(int productId);
 
     /// <summary>
     /// Gets a product pictures by product identifier
@@ -690,6 +701,15 @@ public partial interface IProductService
     /// <param name="productPicture">Product picture</param>
     /// <returns>A task that represents the asynchronous operation</returns>
     Task UpdateProductPictureAsync(ProductPicture productPicture);
+
+
+    /// <summary>
+    /// Inserts a product file
+    /// </summary>
+    /// <param name="productFile">Product file</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
+    Task InsertProductFileAsync(ProductFile productFile);
+
 
     /// <summary>
     /// Get the IDs of all product images 

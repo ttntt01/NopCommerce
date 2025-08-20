@@ -77,6 +77,7 @@ public partial class ProductModelFactory : IProductModelFactory
     protected readonly IUrlRecordService _urlRecordService;
     protected readonly IVideoService _videoService;
     protected readonly IWorkContext _workContext;
+    protected readonly IFileService _fileService;
     protected readonly MeasureSettings _measureSettings;
     protected readonly NopHttpClient _nopHttpClient;
     protected readonly TaxSettings _taxSettings;
@@ -121,6 +122,7 @@ public partial class ProductModelFactory : IProductModelFactory
         IUrlRecordService urlRecordService,
         IVideoService videoService,
         IWorkContext workContext,
+        IFileService fileService,
         MeasureSettings measureSettings,
         NopHttpClient nopHttpClient,
         TaxSettings taxSettings,
@@ -161,6 +163,7 @@ public partial class ProductModelFactory : IProductModelFactory
         _urlRecordService = urlRecordService;
         _videoService = videoService;
         _workContext = workContext;
+        _fileService = fileService;
         _measureSettings = measureSettings;
         _nopHttpClient = nopHttpClient;
         _taxSettings = taxSettings;
@@ -1384,6 +1387,46 @@ public partial class ProductModelFactory : IProductModelFactory
                 productModel.AssociatedToProductName = parentGroupedProduct.Name;
 
                 return productModel;
+            });
+        });
+
+        return model;
+    }
+
+    /// <summary>
+    /// Prepare paged product file list model
+    /// </summary>
+    /// <param name="searchModel">Product file search model</param>
+    /// <param name="product">Product</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the product file list model
+    /// </returns>
+    public virtual async Task<ProductFileListModel> PrepareProductFileListModelAsync(ProductFileSearchModel searchModel, Product product)
+    {
+        ArgumentNullException.ThrowIfNull(searchModel);
+        ArgumentNullException.ThrowIfNull(product);
+
+        //get product file
+        var productFiles = (await _productService.GetProductFileByProductIdAsync(product.Id)).ToPagedList(searchModel);
+
+        //prepare grid model
+        var model = await new ProductFileListModel().PrepareToGridAsync(searchModel, productFiles, () =>
+        {
+            return productFiles.SelectAwait(async productFile =>
+            {
+                //fill in model values from the entity
+                var productFileModel = productFile.ToModel<ProductFileModel>();
+
+                //fill in additional values (not existing in the entity)
+                var file = (await _fileService.GetFileByIdAsync(productFile.Id))
+                              ?? throw new Exception("File cannot be loaded");
+
+                productFileModel.FileUrl = file.VirtualPath;
+                productFileModel.OverrideAltAttribute = file.AltAttribute;
+                productFileModel.OverrideTitleAttribute = file.TitleAttribute;
+
+                return productFileModel;
             });
         });
 

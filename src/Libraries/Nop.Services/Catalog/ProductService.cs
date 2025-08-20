@@ -6,6 +6,7 @@ using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Localization;
+using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
@@ -58,6 +59,7 @@ public partial class ProductService : IProductService
     protected readonly IRepository<Shipment> _shipmentRepository;
     protected readonly IRepository<StockQuantityHistory> _stockQuantityHistoryRepository;
     protected readonly IRepository<TierPrice> _tierPriceRepository;
+    protected readonly IRepository<ProductFile> _productFileRepository;
     protected readonly ISearchPluginManager _searchPluginManager;
     protected readonly IStaticCacheManager _staticCacheManager;
     protected readonly IStoreMappingService _storeMappingService;
@@ -101,6 +103,7 @@ public partial class ProductService : IProductService
         IRepository<Shipment> shipmentRepository,
         IRepository<StockQuantityHistory> stockQuantityHistoryRepository,
         IRepository<TierPrice> tierPriceRepository,
+        IRepository<ProductFile> productFileRepository,
         ISearchPluginManager searchPluginManager,
         IStaticCacheManager staticCacheManager,
         IStoreService storeService,
@@ -139,6 +142,7 @@ public partial class ProductService : IProductService
         _shipmentRepository = shipmentRepository;
         _stockQuantityHistoryRepository = stockQuantityHistoryRepository;
         _tierPriceRepository = tierPriceRepository;
+        _productFileRepository = productFileRepository;
         _searchPluginManager = searchPluginManager;
         _staticCacheManager = staticCacheManager;
         _storeMappingService = storeMappingService;
@@ -2270,6 +2274,26 @@ public partial class ProductService : IProductService
     }
 
     /// <summary>
+    /// Gets a product file by product identifier
+    /// </summary>
+    /// <param name="productId">The product identifier</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the product file
+    /// </returns>
+    public virtual async Task<IList<ProductFile>> GetProductFileByProductIdAsync(int productId)
+    { 
+        var query = from pf in _productFileRepository.Table
+            where pf.ProductId == productId && !pf.IsDeleted
+            orderby pf.Id
+            select pf;
+
+        var productFile = await query.ToListAsync();
+
+        return productFile;
+    }
+
+    /// <summary>
     /// Gets a product pictures by product identifier
     /// </summary>
     /// <param name="productId">The product identifier</param>
@@ -2320,6 +2344,17 @@ public partial class ProductService : IProductService
     public virtual async Task UpdateProductPictureAsync(ProductPicture productPicture)
     {
         await _productPictureRepository.UpdateAsync(productPicture);
+    }
+
+
+    /// <summary>
+    /// Inserts a product file
+    /// </summary>
+    /// <param name="productFile">Product file</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
+    public virtual async Task InsertProductFileAsync(ProductFile productFile)
+    {
+        await _productFileRepository.InsertAsync(productFile);
     }
 
     /// <summary>

@@ -154,6 +154,17 @@ public partial interface IProductModelFactory
     Task<AddAssociatedProductListModel> PrepareAddAssociatedProductListModelAsync(AddAssociatedProductSearchModel searchModel);
 
     /// <summary>
+    /// Prepare paged product file list model
+    /// </summary>
+    /// <param name="searchModel">Product file search model</param>
+    /// <param name="product">Product</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the product file list model
+    /// </returns>
+    Task<ProductFileListModel> PrepareProductFileListModelAsync(ProductFileSearchModel searchModel, Product product);
+
+    /// <summary>
     /// Prepare paged product picture list model
     /// </summary>
     /// <param name="searchModel">Product picture search model</param>
