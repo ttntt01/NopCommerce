@@ -1,0 +1,83 @@
+﻿@model int
+@inject IDownloadService downloadService
+@using Nop.Services.Media
+@using Nop.Web.Framework.UI
+
+@{
+    var clientId = Html.IdForModel().ToString().Replace(".", "_"); // still useful for input naming
+}
+
+@* register CSS and JS *@
+<link rel="stylesheet" href="~/lib_npm/fine-uploader/fine-uploader/fine-uploader.min.css" />
+<script asp-exclude-from-bundle="true" src="~/lib_npm/fine-uploader/jquery.fine-uploader/jquery.fine-uploader.min.js" asp-location="Footer"></script>
+
+
+<!-- FineUploader template -->
+<script type="text/template" id="qq-template">
+    <div class="qq-uploader-selector qq-uploader">
+        <div class="qq-upload-button-selector btn btn-success btn-sm">
+            <i class="fas fa-upload"></i> @T("Admin.Common.Upload")
+        </div>
+        <ul class="qq-upload-list-selector qq-upload-list list-unstyled ml-2 mb-0">
+            <li>
+                <div class="qq-progress-bar-selector qq-progress-bar"></div>
+                <span class="qq-upload-file-selector qq-upload-file"></span>
+                <a class="qq-upload-cancel-selector ml-2 text-danger">@T("Common.FileUploader.Cancel")</a>
+                <span class="qq-upload-status-text-selector qq-upload-status-text ml-2"></span>
+            </li>
+        </ul>
+    </div>
+</script>
+
+<div id="@clientId" class="d-flex align-items-center flex-wrap">
+    <input type="hidden" asp-for="@Model" id="@(clientId)_value" />
+
+    <!-- uploader (upload button) -->
+    <div id="@(clientId)_uploader" class="mr-3"></div>
+
+    <!-- filename + buttons (hidden by default) -->
+    <!-- <div id="@(clientId)fileinfo" class="d-flex align-items-center" style="display:none">
+            <span id="@(clientId)filename" class="mr-2 font-weight-bold"></span> 
+            <a id="@(clientId)downloadlink" class="btn btn-outline-primary btn-sm mr-2" target="_blank">
+                <i class="fas fa-download"></i> @T("Admin.Download.DownloadUploadedFile")
+            </a>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeDownload('@clientId')">
+                <i class="fas fa-times"></i> @T("Admin.Common.Remove")
+            </button>
+        </div> -->
+</div>
+
+<script>
+    $(window).on("load", function () {
+        $("#@(clientId)_uploader").fineUploader({
+            request: {
+                endpoint: '@(Url.Action("AsyncUpload", "Download", new { area = AreaNames.ADMIN }))'
+            },
+            template: "qq-template", // FIX: no "#" here
+            multiple: false,
+            validation: {
+                allowedExtensions: ["pdf", "doc", "docx"],
+                sizeLimit: 20971520
+            }
+        }).on("complete", function (event, id, name, responseJSON) {
+            if (responseJSON.success) {
+                // show filename
+                $("#@(clientId)filename").text(name);
+
+                // show download + remove
+                $("#@(clientId)downloadlink").attr("href", responseJSON.downloadUrl);
+                $("#@(clientId)fileinfo").show();
+
+                // hidden input
+                $("#@(clientId)_value").val(responseJSON.downloadId);
+            }
+        });
+    });
+
+    function removeDownload(clientId) {
+        $("#" + clientId + "filename").text("");
+        $("#" + clientId + "downloadlink").attr("href", "#");
+        $("#" + clientId + "_value").val(0);
+        $("#" + clientId + "fileinfo").hide(); // hide again
+    }
+</script>

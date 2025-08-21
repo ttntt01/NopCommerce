@@ -1,10 +1,18 @@
 @model ProductModel
 
+
+<style>
+    .download-url,
+    label[for="UseDownloadUrl"] {
+        display: none !important;
+    }
+</style>
+
 <div class="card-body">
     @await Html.PartialAsync("Table", new DataTablesModel
     {
-        Name = "productfile-grid",
-        UrlRead = new DataUrl("ProductFileList", "Product", new RouteValueDictionary { [nameof(Model.ProductFileSearchModel.ProductId)] = Model.ProductFileSearchModel.ProductId }),
+        Name = "productfile-grid",        
+        UrlRead = new DataUrl("ProductFileList", "Product", new RouteValueDictionary { ["productId"] = Model.Id }),
         UrlDelete = new DataUrl("ProductFileDelete", "Product", null),        
         Length = Model.ProductFileSearchModel.PageSize,
         LengthMenu = Model.ProductFileSearchModel.AvailablePageSizes,
@@ -36,19 +44,17 @@
             @T("Admin.Catalog.Products.Multimedia.File.AddNew")
         </div>
         <div class="card-body">
+            @* <div class="form-group row"> *@
             <div class="form-group row">
-                @{
-                    ViewData["Endpoint"] = this.Url.Action("ProductFileAdd", "Product", new { productId = Model.Id });
-                    ViewData["TableSelector"] = "#productfile-grid";
-                }
                 <div class="col-md-3">
                     <nop-label asp-for="AddFileModel.FileId" />
                 </div>
-                <div class="col-md-9">
-                    <nop-editor asp-for="AddFileModel.FileId" />
-                    <span asp-validation-for="AddFileModel.FileId"></span>
+                <div class="col-md-9 d-flex align-items-center">
+                    <nop-editor asp-for="AddFileModel.FileId" asp-template="Download1" />
+                    <span asp-validation-for="AddFileModel.FileId" class="text-danger ml-2"></span>
                 </div>
             </div>
+            @* </div> *@
         </div>
     </div>
 </div>
