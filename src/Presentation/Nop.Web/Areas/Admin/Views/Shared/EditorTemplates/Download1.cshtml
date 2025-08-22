@@ -1,10 +1,11 @@
-﻿@model int
+﻿@model Nop.Web.Areas.Admin.Models.Catalog.ProductModel
 @inject IDownloadService downloadService
 @using Nop.Services.Media
 @using Nop.Web.Framework.UI
 
 @{
-    var clientId = Html.IdForModel().ToString().Replace(".", "_"); // still useful for input naming
+    var productId = Model.Id;
+    var clientId = "productfile_" + productId;
 }
 
 @* register CSS and JS *@
@@ -30,30 +31,35 @@
 </script>
 
 <div id="@clientId" class="d-flex align-items-center flex-wrap">
-    <input type="hidden" asp-for="@Model" id="@(clientId)_value" />
+    <input type="hidden" name="ProductFileId" id="@(clientId)_value" value="0" />
 
-    <!-- uploader (upload button) -->
+    <!-- uploader -->
     <div id="@(clientId)_uploader" class="mr-3"></div>
 
     <!-- filename + buttons (hidden by default) -->
-    <!-- <div id="@(clientId)fileinfo" class="d-flex align-items-center" style="display:none">
-            <span id="@(clientId)filename" class="mr-2 font-weight-bold"></span> 
-            <a id="@(clientId)downloadlink" class="btn btn-outline-primary btn-sm mr-2" target="_blank">
-                <i class="fas fa-download"></i> @T("Admin.Download.DownloadUploadedFile")
-            </a>
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeDownload('@clientId')">
-                <i class="fas fa-times"></i> @T("Admin.Common.Remove")
-            </button>
-        </div> -->
+    @* <div id="@(clientId)fileinfo" class="d-flex align-items-center" style="display:none">
+        <span id="@(clientId)filename" class="mr-2 font-weight-bold"></span>
+        <a id="@(clientId)downloadlink" class="btn btn-outline-primary btn-sm mr-2" target="_blank">
+            <i class="fas fa-download"></i> @T("Admin.Download.DownloadUploadedFile")
+        </a>
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeDownload('@clientId')">
+            <i class="fas fa-times"></i> @T("Admin.Common.Remove")
+        </button>
+    </div> *@
 </div>
 
 <script>
     $(window).on("load", function () {
+        var productId = @Model.Id;
+        //alert(productId);
+
         $("#@(clientId)_uploader").fineUploader({
             request: {
-                endpoint: '@(Url.Action("AsyncUpload", "Download", new { area = AreaNames.ADMIN }))'
+                endpoint: '@Url.Action("ProductFileAdd", "Product")',
+                params: { productId: productId },
+                inputName: "files"
             },
-            template: "qq-template", // FIX: no "#" here
+            template: "qq-template",
             multiple: false,
             validation: {
                 allowedExtensions: ["pdf", "doc", "docx"],
@@ -61,15 +67,10 @@
             }
         }).on("complete", function (event, id, name, responseJSON) {
             if (responseJSON.success) {
-                // show filename
                 $("#@(clientId)filename").text(name);
-
-                // show download + remove
                 $("#@(clientId)downloadlink").attr("href", responseJSON.downloadUrl);
                 $("#@(clientId)fileinfo").show();
-
-                // hidden input
-                $("#@(clientId)_value").val(responseJSON.downloadId);
+                $("#@(clientId)_value").val(responseJSON.fileId);
             }
         });
     });
@@ -78,6 +79,6 @@
         $("#" + clientId + "filename").text("");
         $("#" + clientId + "downloadlink").attr("href", "#");
         $("#" + clientId + "_value").val(0);
-        $("#" + clientId + "fileinfo").hide(); // hide again
+        $("#" + clientId + "fileinfo").hide();
     }
 </script>

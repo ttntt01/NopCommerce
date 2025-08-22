@@ -1710,42 +1710,72 @@ public partial class ProductController : BaseAdminController
         var product = await _productService.GetProductByIdAsync(productId)
             ?? throw new ArgumentException("No product found with the specified id");
 
-        var files = form.Files.ToList();
-        if (!files.Any())
+        var file = form.Files.FirstOrDefault();
+        if (file == null)
             return Json(new { success = false });
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null && product.VendorId != currentVendor.Id)
             return RedirectToAction("List");
+
+        var mimeType = file.ContentType; // e.g. "application/pdf", "image/png"
+        if (string.IsNullOrEmpty(mimeType))
+            mimeType = "application/octet-stream"; // fallback default
+
         try
         {
-            foreach (var file in files)
+            //insert file
+            var f = await _fileService.InsertFileAsync(productId, file);
+
+            ////link to product
+            //await _productService.InsertProductFileAsync(new ProductFile
+            //{
+            //    Id = f.Id,
+            //    ProductId = product.Id,
+            //    MimeType = mimeType,
+            //    CreatedDateTimeUTC = DateTime.UtcNow,
+            //    IsNew = true,
+            //    UpdatedDateTimeUTC = DateTime.UtcNow
+            //});
+
+            return Json(new
             {
-                //insert file
-                var f = await _fileService.InsertFileAsync(file);
-
-                //await _fileService.SetSeoFilenameAsync(picture.Id, await _pictureService.GetPictureSeNameAsync(product.Name));
-
-                await _productService.InsertProductFileAsync(new ProductFile
-                {
-                    Id = f.Id,
-                    ProductId = product.Id,
-                    IsNew = true,
-                    CreatedDateTimeUTC = DateTime.UtcNow,
-                });
-            }
+                success = true,
+                fileId = f.Id,
+                downloadUrl = Url.Action("DownloadFile", "Product", new { id = f.Id })
+            });
         }
         catch (Exception exc)
         {
             return Json(new
             {
                 success = false,
-                message = $"{await _localizationService.GetResourceAsync("Admin.Catalog.Products.Multimedia.Files.Alert.FileAdd")} {exc.Message}",
+                message = $"{await _localizationService.GetResourceAsync("Admin.Catalog.Products.Multimedia.Files.Alert.FileAdd")} {exc.Message}"
             });
         }
+    }
 
-        return Json(new { success = true });
+
+    [HttpGet]
+    public async Task<IActionResult> DownloadFile(int id)
+    {
+        // get product file metadata
+        var productFile = await _fileService.GetFileByIdAsync(id);
+        if (productFile == null)
+            return NotFound();
+
+        // get file binary
+        var fileBinary = await _fileService.GetFileBinaryByFileIdAsync(productFile.Id);
+        if (fileBinary == null || fileBinary.BinaryData == null)
+            return NotFound();
+
+        // return the file
+        return File(
+            fileBinary.BinaryData,
+            productFile.MimeType ?? "application/octet-stream",
+            productFile.SeoFilename ?? "download"
+        );
     }
 
     [HttpPost]

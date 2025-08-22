@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Nop.Core;
 using Nop.Core.Domain.Media;
 using Nop.Core.Infrastructure;
 using Nop.Data;
 using Nop.Services.Logging;
+
 
 namespace Nop.Services.Media;
 
@@ -53,7 +55,7 @@ public partial class FileService : IFileService
     /// A task that represents the asynchronous operation
     /// The task result contains the picture
     /// </returns>
-    public virtual async Task<ProductFile> InsertFileAsync(byte[] fileBinary, string mimeType, string seoFilename,
+    public virtual async Task<ProductFile> InsertFileAsync(int productId, byte[] fileBinary, string mimeType, string seoFilename,
         string altAttribute = null, string titleAttribute = null,
         bool isNew = true, bool validateBinary = true)
     {
@@ -64,15 +66,19 @@ public partial class FileService : IFileService
 
         var productFile = new ProductFile
         {
+            ProductId = productId,
             MimeType = mimeType,
             SeoFilename = seoFilename,
             AltAttribute = altAttribute,
             TitleAttribute = titleAttribute,
-            IsNew = isNew
+            CreatedDateTimeUTC = DateTime.UtcNow,
+            IsNew = isNew,
+            UpdatedDateTimeUTC = DateTime.UtcNow
         };
+
+        
         await _productFileRepository.InsertAsync(productFile);
         await UpdateFileBinaryAsync(productFile, fileBinary);
-
         await SaveFileInFileAsync(productFile.Id, fileBinary, mimeType);
 
         return productFile;
@@ -82,6 +88,7 @@ public partial class FileService : IFileService
     /// <summary>
     /// Inserts a file
     /// </summary>
+    /// <param name="productId">Product identifier file</param>
     /// <param name="formFile">Form file</param>
     /// <param name="defaultFileName">File name which will be use if IFormFile.FileName not present</param>
     /// <param name="virtualPath">Virtual path</param>
@@ -89,7 +96,7 @@ public partial class FileService : IFileService
     /// A task that represents the asynchronous operation
     /// The task result contains the file
     /// </returns>
-    public virtual async Task<ProductFile> InsertFileAsync(IFormFile formFile, string defaultFileName = "", string virtualPath = "")
+    public virtual async Task<ProductFile> InsertFileAsync(int productId, IFormFile formFile, string defaultFileName = "", string virtualPath = "")
     {
         var fileExt = new List<string>
         {
@@ -121,7 +128,7 @@ public partial class FileService : IFileService
             contentType = GetFileContentTypeByFileExtension(fileExtension);
 
 
-        var productFile = await InsertFileAsync(await _downloadService.GetDownloadBitsAsync(formFile),
+        var productFile = await InsertFileAsync(productId, await _downloadService.GetDownloadBitsAsync(formFile),
             contentType,
             _fileProvider.GetFileNameWithoutExtension(fileName));
 
@@ -211,7 +218,7 @@ public partial class FileService : IFileService
     /// A task that represents the asynchronous operation
     /// The task result contains the file binary
     /// </returns>
-    protected virtual async Task<FileBinary> GetFileBinaryByFileIdAsync(int fileId)
+    public virtual async Task<FileBinary> GetFileBinaryByFileIdAsync(int fileId)
     {
         return await _fileBinaryRepository.Table
             .FirstOrDefaultAsync(pb => pb.FileId == fileId);
@@ -229,7 +236,17 @@ public partial class FileService : IFileService
     {
         var lastPart = await GetFileExtensionFromMimeTypeAsync(mimeType);
         var fileName = $"{fileId:0000000}_0.{lastPart}";
-        await _fileProvider.WriteAllBytesAsync(await GetFileLocalPathAsync(fileName), fileBinary);
+        var filePath = await GetFileLocalPathAsync(fileName);
+
+        // Ensure folder exists
+        var directory = Path.GetDirectoryName(filePath);
+        if (!System.IO.Directory.Exists(directory))
+        {
+            System.IO.Directory.CreateDirectory(directory);
+        }
+
+        // Save file
+        await _fileProvider.WriteAllBytesAsync(filePath, fileBinary);
     }
 
 

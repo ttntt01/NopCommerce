@@ -22,13 +22,14 @@ public partial interface IFileService
     /// A task that represents the asynchronous operation
     /// The task result contains the picture
     /// </returns>
-    Task<ProductFile> InsertFileAsync(byte[] fileBinary, string mimeType, string seoFilename,
+    Task<ProductFile> InsertFileAsync(int productId, byte[] fileBinary, string mimeType, string seoFilename,
         string altAttribute = null, string titleAttribute = null,
         bool isNew = true, bool validateBinary = true);
 
     /// <summary>
     /// Inserts a file
     /// </summary>
+    /// <param name="productId">Product identifier file</param>
     /// <param name="formFile">Form file</param>
     /// <param name="defaultFileName">File name which will be use if IFormFile.FileName not present</param>
     /// <param name="virtualPath">Virtual path</param>
@@ -36,7 +37,17 @@ public partial interface IFileService
     /// A task that represents the asynchronous operation
     /// The task result contains the file
     /// </returns>
-    Task<ProductFile> InsertFileAsync(IFormFile formFile, string defaultFileName = "", string virtualPath = "");
+    Task<ProductFile> InsertFileAsync(int productId, IFormFile formFile, string defaultFileName = "", string virtualPath = "");
+
+    /// <summary>
+    /// Get product file binary by file identifier
+    /// </summary>
+    /// <param name="fileId">The file identifier</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the file binary
+    /// </returns>
+    Task<FileBinary> GetFileBinaryByFileIdAsync(int fileId);
 
     /// <summary>
     /// Soft delete file

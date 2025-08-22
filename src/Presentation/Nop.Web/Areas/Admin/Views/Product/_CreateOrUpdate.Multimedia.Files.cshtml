@@ -11,50 +11,51 @@
 <div class="card-body">
     @await Html.PartialAsync("Table", new DataTablesModel
     {
-        Name = "productfile-grid",        
+        Name = "productfile-grid",
         UrlRead = new DataUrl("ProductFileList", "Product", new RouteValueDictionary { ["productId"] = Model.Id }),
-        UrlDelete = new DataUrl("ProductFileDelete", "Product", null),        
+        UrlDelete = new DataUrl("ProductFileDelete", "Product", null),
         Length = Model.ProductFileSearchModel.PageSize,
         LengthMenu = Model.ProductFileSearchModel.AvailablePageSizes,
         ColumnCollection = new List<ColumnProperty>
+        {
+            new ColumnProperty(nameof(ProductFileModel.FileUrl))
             {
-                new ColumnProperty(nameof(ProductFileModel.FileUrl))
-                {
-                    Title = T("Admin.Catalog.Products.Multimedia.Files.Fields.File").Text,
-                    Render = new RenderCustom("renderFilesColumnProductFileUrl")
-                },
-                new ColumnProperty(nameof(ProductFileModel.Id))
-                {
-                    Title = T("Admin.Common.Delete").Text,
-                    Width = "100",
-                    Render = new RenderButtonRemove(T("Admin.Common.Delete").Text),
-                    ClassName = NopColumnClassDefaults.Button
-                }
+                Title = T("Admin.Catalog.Products.Multimedia.Files.Fields.File").Text,
+                Render = new RenderCustom("renderFilesColumnProductFileUrl")
+            },
+            new ColumnProperty(nameof(ProductFileModel.Id))
+            {
+            Title = T("Admin.Common.Delete").Text,
+            Width = "100",
+            Render = new RenderButtonRemove(T("Admin.Common.Delete").Text),
+            ClassName = NopColumnClassDefaults.Button
             }
+        }
     })
 
     <script>
         function renderFilesColumnProductFileUrl(data, type, row, meta) {
-            return '<a href="' + row.PictureUrl + '" target="_blank"><img alt="' + row.PictureId + '" src="' + row.PictureUrl + '" width="150" /></a>';
+            // Show a file link instead of image (better for PDFs/docs)
+            return '<a href="' + row.FileUrl + '" target="_blank">' + row.FileName + '</a>';
         }
     </script>
 
-    <div class="card card-default">
+    <div class="card card-default mt-3">
         <div class="card-header">
             @T("Admin.Catalog.Products.Multimedia.File.AddNew")
         </div>
         <div class="card-body">
-            @* <div class="form-group row"> *@
             <div class="form-group row">
                 <div class="col-md-3">
                     <nop-label asp-for="AddFileModel.FileId" />
                 </div>
                 <div class="col-md-9 d-flex align-items-center">
-                    <nop-editor asp-for="AddFileModel.FileId" asp-template="Download1" />
+                    @* <nop-editor asp-for="AddFileModel.FileId" asp-template="Download1" /> *@
+                    @* FIX: render Download1 manually with ProductModel *@
+                    @await Html.PartialAsync("~/Areas/Admin/Views/Shared/EditorTemplates/Download1.cshtml", Model)
                     <span asp-validation-for="AddFileModel.FileId" class="text-danger ml-2"></span>
                 </div>
             </div>
-            @* </div> *@
         </div>
     </div>
 </div>
