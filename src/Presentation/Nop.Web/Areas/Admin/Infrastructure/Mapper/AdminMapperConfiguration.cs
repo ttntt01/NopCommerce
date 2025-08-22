@@ -112,6 +112,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
         CreateVendorsMaps();
         CreateWarehouseMaps();
         CreateCommissionMaps();
+        CreateFileMaps();
 
         //add some generic mapping rules
         this.Internal().ForAllMaps((mapConfiguration, map) =>
@@ -1748,6 +1749,14 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     protected virtual void CreateCommissionMaps()
     {
         CreateMap<ParentChildSumOrderStats, ParentChildSumOrderStatsModel>();
+    }
+
+    /// <summary>
+    /// Create file maps 
+    /// </summary>
+    protected virtual void CreateFileMaps()
+    {
+        CreateMap<ProductFile, ProductFileModel>();
     }
 
     #endregion

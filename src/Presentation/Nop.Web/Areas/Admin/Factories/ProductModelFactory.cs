@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Net;
 using System.Text;
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using Nop.Core;
@@ -1409,7 +1408,7 @@ public partial class ProductModelFactory : IProductModelFactory
 
         //get product file
         var productFiles = (await _productService.GetProductFileByProductIdAsync(product.Id)).ToPagedList(searchModel);
-
+     
         //prepare grid model
         var model = await new ProductFileListModel().PrepareToGridAsync(searchModel, productFiles, () =>
         {
@@ -1420,7 +1419,7 @@ public partial class ProductModelFactory : IProductModelFactory
 
                 //fill in additional values (not existing in the entity)
                 var file = (await _fileService.GetFileByIdAsync(productFile.Id))
-                              ?? throw new Exception("File cannot be loaded");
+                                ?? throw new Exception("File cannot be loaded");
 
                 productFileModel.FileUrl = file.VirtualPath;
                 productFileModel.OverrideAltAttribute = file.AltAttribute;
