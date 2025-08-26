@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Nop.Core;
 using Nop.Core.Domain.Media;
@@ -21,19 +22,23 @@ public partial class FileService : IFileService
     protected readonly IDownloadService _downloadService;
     protected readonly IRepository<ProductFile> _productFileRepository;
     protected readonly IRepository<FileBinary> _fileBinaryRepository;
+    private readonly IWebHelper _webHelper;
+    private readonly IWebHostEnvironment _env;
 
     #endregion
 
 
     #region Ctor
 
-    public FileService(ILogger logger, INopFileProvider fileProvider, IDownloadService downloadService, IRepository<ProductFile> productFileRepository, IRepository<FileBinary> fileBinaryRepository)
+    public FileService(ILogger logger, INopFileProvider fileProvider, IDownloadService downloadService, IRepository<ProductFile> productFileRepository, IRepository<FileBinary> fileBinaryRepository, IWebHelper webHelper, IWebHostEnvironment env)
     {
         _logger = logger;
         _fileProvider = fileProvider;
         _downloadService = downloadService;
         _productFileRepository = productFileRepository;
         _fileBinaryRepository = fileBinaryRepository;
+        _webHelper = webHelper;
+        _env = env;
     }
 
     #endregion
@@ -73,13 +78,16 @@ public partial class FileService : IFileService
             TitleAttribute = titleAttribute,
             CreatedDateTimeUTC = DateTime.UtcNow,
             IsNew = isNew,
+            IsDeleted = false,
             UpdatedDateTimeUTC = DateTime.UtcNow
         };
 
         
         await _productFileRepository.InsertAsync(productFile);
         await UpdateFileBinaryAsync(productFile, fileBinary);
-        await SaveFileInFileAsync(productFile.Id, fileBinary, mimeType);
+        var virtualPath = await SaveFileInFileAsync(productFile.Id, fileBinary, mimeType);
+        var fileUrl = GetFileUrl(virtualPath);
+        productFile.VirtualPath = fileUrl;
 
         return productFile;
     }
@@ -133,10 +141,10 @@ public partial class FileService : IFileService
             _fileProvider.GetFileNameWithoutExtension(fileName));
 
 
-        if (string.IsNullOrEmpty(virtualPath))
+        if (string.IsNullOrEmpty(productFile.VirtualPath))
             return productFile;
 
-        productFile.VirtualPath = _fileProvider.GetVirtualPath(virtualPath);
+        //productFile.VirtualPath = _fileProvider.GetVirtualPath(productFile.VirtualPath);
 
         await UpdateFileAsync(productFile);
 
@@ -157,19 +165,8 @@ public partial class FileService : IFileService
         if (productFile == null)
             return null;
 
-        var seoFilename = CommonHelper.EnsureMaximumLength(productFile.SeoFilename, 100);
-
-        productFile.SeoFilename = seoFilename;
-
-
-        //soft delete the existing file
-        productFile.IsDeleted = true;
         productFile.UpdatedDateTimeUTC = DateTime.UtcNow;
         await _productFileRepository.UpdateAsync(productFile);
-
-        await UpdateFileBinaryAsync(productFile, (await GetFileBinaryByFileIdAsync(productFile.Id)).BinaryData);
-
-        await SaveFileInFileAsync(productFile.Id, (await GetFileBinaryByFileIdAsync(productFile.Id)).BinaryData, productFile.MimeType);
 
         return productFile;
     }
@@ -209,7 +206,6 @@ public partial class FileService : IFileService
     }
 
 
-
     /// <summary>
     /// Get product file binary by file identifier
     /// </summary>
@@ -232,7 +228,7 @@ public partial class FileService : IFileService
     /// <param name="fileBinary">File binary</param>
     /// <param name="mimeType">MIME type</param>
     /// <returns>A task that represents the asynchronous operation</returns>
-    protected virtual async Task SaveFileInFileAsync(int fileId, byte[] fileBinary, string mimeType)
+    protected virtual async Task<string> SaveFileInFileAsync(int fileId, byte[] fileBinary, string mimeType)
     {
         var lastPart = await GetFileExtensionFromMimeTypeAsync(mimeType);
         var fileName = $"{fileId:0000000}_0.{lastPart}";
@@ -247,6 +243,9 @@ public partial class FileService : IFileService
 
         // Save file
         await _fileProvider.WriteAllBytesAsync(filePath, fileBinary);
+
+        // Return file path
+        return filePath;
     }
 
 
@@ -342,6 +341,29 @@ public partial class FileService : IFileService
     public virtual async Task<ProductFile> GetFileByIdAsync(int fileId)
     {
         return await _productFileRepository.GetByIdAsync(fileId, cache => default);
+    }
+
+
+    /// <summary>
+    /// Convert file virtual path to url
+    /// </summary>
+    /// <param name="filePath">File virtual path</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the file url
+    /// </returns>
+    protected string GetFileUrl(string filePath)
+    {
+        // strip the physical wwwroot path
+        var relativePath = filePath
+            .Replace(_env.WebRootPath, "")
+            .Replace("\\", "/");
+
+        if (!relativePath.StartsWith("/"))
+            relativePath = "/" + relativePath;
+
+        // build full url from store base url
+        return $"{_webHelper.GetStoreLocation().TrimEnd('/')}{relativePath}";
     }
 
     #endregion

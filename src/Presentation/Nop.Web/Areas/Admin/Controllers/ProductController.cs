@@ -1756,7 +1756,6 @@ public partial class ProductController : BaseAdminController
         }
     }
 
-
     [HttpGet]
     public async Task<IActionResult> DownloadFile(int id)
     {
