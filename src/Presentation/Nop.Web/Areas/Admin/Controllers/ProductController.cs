@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using DocumentFormat.OpenXml.EMMA;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Nop.Core;
@@ -1710,6 +1709,11 @@ public partial class ProductController : BaseAdminController
         var product = await _productService.GetProductByIdAsync(productId)
             ?? throw new ArgumentException("No product found with the specified id");
 
+        var productFile = await _productService.GetProductFileByProductIdAsync(productId);
+
+        if (productFile.Count > 0)
+            throw new Exception("Please delete the existing product file and reupload the latest version.");
+
         var file = form.Files.FirstOrDefault();
         if (file == null)
             return Json(new { success = false });
@@ -1725,19 +1729,7 @@ public partial class ProductController : BaseAdminController
 
         try
         {
-            //insert file
             var f = await _fileService.InsertFileAsync(productId, file);
-
-            ////link to product
-            //await _productService.InsertProductFileAsync(new ProductFile
-            //{
-            //    Id = f.Id,
-            //    ProductId = product.Id,
-            //    MimeType = mimeType,
-            //    CreatedDateTimeUTC = DateTime.UtcNow,
-            //    IsNew = true,
-            //    UpdatedDateTimeUTC = DateTime.UtcNow
-            //});
 
             return Json(new
             {

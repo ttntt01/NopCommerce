@@ -36,8 +36,6 @@
     <script>
         function renderFilesColumnProductFileUrl(data, type, row, meta) {
             // Show a file link instead of image (better for PDFs/docs)
-            console.log(row.FileUrl);            
-            console.log(row.FileName);
             return '<a href="' + row.FileUrl + '" target="_blank">' + row.FileName + '</a>';
         }
     </script>
