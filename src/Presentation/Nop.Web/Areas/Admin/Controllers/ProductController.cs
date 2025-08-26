@@ -1804,15 +1804,15 @@ public partial class ProductController : BaseAdminController
         if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageProducts))
             return await AccessDeniedDataTablesJson();
 
-        //try to get a product picture with the specified id
-        var productPicture = await _productService.GetProductPictureByIdAsync(id)
-            ?? throw new ArgumentException("No product picture found with the specified id");
+        //try to get a product file with the specified id
+        var productFile = await _productService.GetProductFileByIdAsync(id)
+            ?? throw new ArgumentException("No product file found with the specified id");
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null)
         {
-            var product = await _productService.GetProductByIdAsync(productPicture.ProductId);
+            var product = await _productService.GetProductByIdAsync(productFile.ProductId);
             if (product != null && product.VendorId != currentVendor.Id)
                 return Content("This is not your product");
         }

@@ -2294,6 +2294,20 @@ public partial class ProductService : IProductService
     }
 
     /// <summary>
+    /// Gets a product file
+    /// </summary>
+    /// <param name="fileId">File identifier</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the product file
+    /// </returns>
+    public virtual async Task<ProductFile> GetProductFileByIdAsync(int fileId)
+    {
+        return await _productFileRepository.Table.FirstOrDefaultAsync(pf => pf.Id == fileId);
+    }
+
+
+    /// <summary>
     /// Gets a product pictures by product identifier
     /// </summary>
     /// <param name="productId">The product identifier</param>

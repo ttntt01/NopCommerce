@@ -669,6 +669,16 @@ public partial interface IProductService
     Task<IList<ProductFile>> GetProductFileByProductIdAsync(int productId);
 
     /// <summary>
+    /// Gets a product file
+    /// </summary>
+    /// <param name="fileId">File identifier</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the product file
+    /// </returns>
+    Task<ProductFile> GetProductFileByIdAsync(int fileId);
+
+    /// <summary>
     /// Gets a product pictures by product identifier
     /// </summary>
     /// <param name="productId">The product identifier</param>
