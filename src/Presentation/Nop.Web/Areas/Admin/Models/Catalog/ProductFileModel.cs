@@ -15,6 +15,8 @@ public partial record ProductFileModel : BaseNopEntityModel
 
     public string FileUrl { get; set; }
 
+    public string FileName { get; set; }
+
     public bool IsDeleted { get; set; }
 
     public string OverrideAltAttribute { get; set; }

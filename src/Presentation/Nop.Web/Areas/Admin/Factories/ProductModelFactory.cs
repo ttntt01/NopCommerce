@@ -1422,6 +1422,7 @@ public partial class ProductModelFactory : IProductModelFactory
                                 ?? throw new Exception("File cannot be loaded");
 
                 productFileModel.FileUrl = file.VirtualPath;
+                productFileModel.FileName = file.SeoFilename;
                 productFileModel.OverrideAltAttribute = file.AltAttribute;
                 productFileModel.OverrideTitleAttribute = file.TitleAttribute;
 
