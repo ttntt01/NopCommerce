@@ -82,3 +82,33 @@
         $("#" + clientId + "fileinfo").hide();
     }
 </script>
+
+<script>
+    function disableUploader(clientId) {
+        // target the upload button
+        let $btn = $("#" + clientId + "_uploader .qq-upload-button-selector");
+
+        // add disabled styling + disable click
+        $btn.css({
+            "pointer-events": "none",
+            "opacity": "0.5",
+            "cursor": "not-allowed"
+        });
+
+        // also disable file input under FineUploader
+        $("#" + clientId + "_uploader input[type=file]").prop("disabled", true);
+    }
+
+    function enableUploader(clientId) {
+        let $btn = $("#" + clientId + "_uploader .qq-upload-button-selector");
+
+        // restore normal styling
+        $btn.css({
+            "pointer-events": "auto",
+            "opacity": "1",
+            "cursor": "pointer"
+        });
+
+        $("#" + clientId + "_uploader input[type=file]").prop("disabled", false);
+    }
+</script>

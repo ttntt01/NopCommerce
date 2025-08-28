@@ -1709,11 +1709,6 @@ public partial class ProductController : BaseAdminController
         var product = await _productService.GetProductByIdAsync(productId)
             ?? throw new ArgumentException("No product found with the specified id");
 
-        var productFile = await _productService.GetProductFileByProductIdAsync(productId);
-
-        if (productFile.Count > 0)
-            throw new Exception("Please delete the existing product file and reupload the latest version.");
-
         var file = form.Files.FirstOrDefault();
         if (file == null)
             return Json(new { success = false });
@@ -1772,6 +1767,8 @@ public partial class ProductController : BaseAdminController
     [HttpPost]
     public virtual async Task<IActionResult> ProductFileList(ProductFileSearchModel searchModel)
     {
+        var errMsg = "";
+
         if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManageProducts))
             return await AccessDeniedDataTablesJson();
 
@@ -1782,10 +1779,15 @@ public partial class ProductController : BaseAdminController
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null && product.VendorId != currentVendor.Id)
-            return Content("This is not your product");
+            errMsg = "This is not your product";
+
+        var productFile = await _productService.GetProductFileByProductIdAsync(product.Id);
+        if (productFile.Count > 0)
+            errMsg = "* A file already exists for this product. You must delete the old one before uploading a new one.";
 
         //prepare model
         var model = await _productModelFactory.PrepareProductFileListModelAsync(searchModel, product);
+        model.ErrorMessage = errMsg;
 
         return Json(model);
     }

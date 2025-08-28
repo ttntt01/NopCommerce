@@ -7,4 +7,5 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record ProductFileListModel : BasePagedListModel<ProductFileModel>
 {
+    public string ErrorMessage { get; set; }
 }
