@@ -73,6 +73,7 @@ public partial class ProductModelFactory : IProductModelFactory
     protected readonly IUrlRecordService _urlRecordService;
     protected readonly IVendorService _vendorService;
     protected readonly IVideoService _videoService;
+    protected readonly IFileService _fileService;
     protected readonly IWebHelper _webHelper;
     protected readonly IWorkContext _workContext;
     protected readonly MediaSettings _mediaSettings;
@@ -119,6 +120,7 @@ public partial class ProductModelFactory : IProductModelFactory
         IUrlRecordService urlRecordService,
         IVendorService vendorService,
         IVideoService videoService,
+        IFileService fileService,
         IWebHelper webHelper,
         IWorkContext workContext,
         MediaSettings mediaSettings,
@@ -167,6 +169,7 @@ public partial class ProductModelFactory : IProductModelFactory
         _shippingSettings = shippingSettings;
         _vendorSettings = vendorSettings;
         _videoService = videoService;
+        _fileService = fileService;
     }
 
     #endregion
@@ -1554,6 +1557,17 @@ public partial class ProductModelFactory : IProductModelFactory
                 };
             }
         }
+
+        var productFile = await _fileService.GetFileByProductIdAsync(product.Id);
+        var mimeType = productFile.MimeType;
+        model.DefaultFileModel = new FileModel
+        {
+            Id = productFile.Id,
+            ProductId = productFile.ProductId,
+            MimeType = mimeType.Substring(mimeType.LastIndexOf("/") + 1),
+            SeoFilename = productFile.SeoFilename,
+            VirtualPath = productFile.VirtualPath,
+        };
 
         //page sharing
         if (_catalogSettings.ShowShareButton && !string.IsNullOrEmpty(_catalogSettings.PageShareCode))

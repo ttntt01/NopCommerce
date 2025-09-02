@@ -2,6 +2,28 @@
 
 <link rel="stylesheet" href="~/lib_npm/magnific-popup/magnific-popup.css" />
 <script asp-exclude-from-bundle="true" src="~/lib_npm/magnific-popup/jquery.magnific-popup.min.js" asp-location="Footer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<!-- Rainbow style for both icons -->
+<style>
+    .rainbow-icon {
+        font-size: 2em; /* Bigger icon */
+        background: linear-gradient(90deg, black, gray, white);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+        .rainbow-icon:hover {
+            background: linear-gradient(90deg, violet, indigo, blue, green, yellow, orange, red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+</style>
+<!-- Enable tooltips (once in your page footer or layout) -->
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
 
 <div class="picture-gallery">
     @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.ProductDetailsBeforePictures, additionalData = Model })
@@ -20,6 +42,53 @@
         else
         {
             <img alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" id="main-product-img-@Model.Id" />
+
+            <div class="product-pdf mt-3 text-center" style="clear: both; display:block; margin-top:150px; text-align: center;">
+                @{
+                    var seoFileName = Model.DefaultFileModel.SeoFilename; // e.g. 会社ビジネス＆パートナープレゼン_20250328
+                    var seoUrl = Url.Content(seoFileName + "." + Model.DefaultFileModel.MimeType);
+                    var realUrl = Model.DefaultFileModel.VirtualPath; // actual path like /file/0001022_0.pdf
+                }
+
+                @* <!-- View PDF in browser -->
+                <a href="#"
+                   onclick="event.preventDefault(); window.open('@realUrl', '_blank');"
+                   class="button-1"
+                   data-toggle="tooltip"
+                   data-placement="top"
+                   title="View">
+                    <i class="fas fa-eye rainbow-icon"></i>
+                </a> *@
+
+                @* <!-- Force download -->
+                <a href="@realUrl"
+                   download="@seoUrl"
+                   class="button-2 ml-2"
+                   data-toggle="tooltip"
+                   data-placement="top"
+                   title="Download">
+                    <i class="fas fa-download rainbow-icon"></i>
+                </a> *@
+                <a href="#"
+                   onclick="event.preventDefault(); downloadFile('@realUrl', '@seoUrl');"
+                   class="button-2 ml-2"
+                   data-toggle="tooltip"
+                   data-placement="top"
+                   title="Download">
+                    <i class="fas fa-download rainbow-icon"></i>
+                </a>
+
+                <script>
+                    function downloadFile(realUrl, seoName) {
+                        const link = document.createElement('a');
+                        link.href = realUrl;
+                        link.download = seoName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                </script>
+            </div>
         }
     </div>
     @if (Model.PictureModels.Count > 1 && Model.DefaultPictureZoomEnabled)

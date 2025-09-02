@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Nop.Core;
@@ -364,6 +365,20 @@ public partial class FileService : IFileService
 
         // build full url from store base url
         return $"{_webHelper.GetStoreLocation().TrimEnd('/')}{relativePath}";
+    }
+
+
+    /// <summary>
+    /// Gets a file
+    /// </summary>
+    /// <param name="productId">Product identifier</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the file
+    /// </returns>
+    public virtual async Task<ProductFile> GetFileByProductIdAsync(int productId)
+    {
+        return await _productFileRepository.Table.FirstOrDefaultAsync(pf => pf.ProductId == productId);
     }
 
     #endregion

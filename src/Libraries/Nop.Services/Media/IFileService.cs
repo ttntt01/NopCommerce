@@ -65,4 +65,14 @@ public partial interface IFileService
     /// The task result contains the file
     /// </returns>
     Task<ProductFile> GetFileByIdAsync(int fileId);
+
+    /// <summary>
+    /// Gets a file
+    /// </summary>
+    /// <param name="productId">Product identifier</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the file
+    /// </returns>
+    Task<ProductFile> GetFileByProductIdAsync(int productId);
 }

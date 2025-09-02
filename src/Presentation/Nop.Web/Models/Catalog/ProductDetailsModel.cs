@@ -13,6 +13,7 @@ public partial record ProductDetailsModel : BaseNopEntityModel
 {
     public ProductDetailsModel()
     {
+        DefaultFileModel = new FileModel();
         DefaultPictureModel = new PictureModel();
         PictureModels = new List<PictureModel>();
         VideoModels = new List<VideoModel>();
@@ -34,6 +35,7 @@ public partial record ProductDetailsModel : BaseNopEntityModel
 
     //picture(s)
     public bool DefaultPictureZoomEnabled { get; set; }
+    public FileModel DefaultFileModel { get; set; }
     public PictureModel DefaultPictureModel { get; set; }
     public IList<PictureModel> PictureModels { get; set; }
 
