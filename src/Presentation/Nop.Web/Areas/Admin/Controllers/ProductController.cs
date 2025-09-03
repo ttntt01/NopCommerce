@@ -1709,6 +1709,16 @@ public partial class ProductController : BaseAdminController
         var product = await _productService.GetProductByIdAsync(productId)
             ?? throw new ArgumentException("No product found with the specified id");
 
+        var productFile = await _productService.GetProductFileByProductIdAsync(product.Id);
+        if (productFile.Count > 0)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "A file already exists for this product. You must delete the old one before uploading a new one."
+            });
+        }            
+
         var file = form.Files.FirstOrDefault();
         if (file == null)
             return Json(new { success = false });
