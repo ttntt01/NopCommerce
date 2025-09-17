@@ -18,7 +18,7 @@ public class PaymentManualViewComponent : NopViewComponent
                 new() { Text = "Visa", Value = "visa" },
                 new() { Text = "Master card", Value = "MasterCard" },
                 new() { Text = "Discover", Value = "Discover" },
-                new() { Text = "Amex", Value = "Amex" },
+                //new() { Text = "Amex", Value = "Amex" },
             }
         };
 
