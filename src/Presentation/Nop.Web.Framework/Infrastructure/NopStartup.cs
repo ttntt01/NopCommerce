@@ -240,6 +240,7 @@ public partial class NopStartup : INopStartup
         services.AddScoped<IParentChildRelationsService, ParentChildRelationsService>();
         services.AddScoped<IParentChildLineStatsService, ParentChildLineStatsService>();
         services.AddScoped<IParentChildSumOrderStatsService, ParentChildSumOrderStatsService>();
+        services.AddScoped<IParentBankDetailsService, ParentBankDetailsService>();
         services.AddScoped<ICommissionService, CommissionService>();
 
 

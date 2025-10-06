@@ -1,5 +1,7 @@
 ﻿using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml.Math;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Nop.Core;
@@ -95,6 +97,7 @@ public partial class CustomerController : BasePublicController
     protected readonly IParentChildRelationsService _parentChildRelationsService;
     protected readonly IParentChildLineStatsService _parentChildLineStatsService;
     protected readonly IParentChildSumOrderStatsService _parentChildSumOrderStatsService;
+    protected readonly IParentBankDetailsService _parentBankDetailsService;
     protected readonly LocalizationSettings _localizationSettings;
     protected readonly MediaSettings _mediaSettings;
     protected readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
@@ -150,6 +153,7 @@ public partial class CustomerController : BasePublicController
         IParentChildRelationsService parentChildRelationsService,
         IParentChildLineStatsService parentChildLineStatsService,
         IParentChildSumOrderStatsService parentChildSumOrderStatsService,
+        IParentBankDetailsService parentBankDetailsService,
         LocalizationSettings localizationSettings,
         MediaSettings mediaSettings,
         MultiFactorAuthenticationSettings multiFactorAuthenticationSettings,
@@ -200,6 +204,7 @@ public partial class CustomerController : BasePublicController
         _parentChildRelationsService = parentChildRelationsService;
         _parentChildLineStatsService = parentChildLineStatsService;
         _parentChildSumOrderStatsService = parentChildSumOrderStatsService;
+        _parentBankDetailsService = parentBankDetailsService;
         _localizationSettings = localizationSettings;
         _mediaSettings = mediaSettings;
         _multiFactorAuthenticationSettings = multiFactorAuthenticationSettings;
@@ -1439,8 +1444,40 @@ public partial class CustomerController : BasePublicController
             };
         }
 
+        var bankDetails = await _parentBankDetailsService.GetParentBankDetailsAsync(customer.Id);
+        var bankDetailsModel = new ParentBankDetailsModel();
+        if (bankDetails == null)
+        {
+            bankDetailsModel.Id = 0;
+            bankDetailsModel.ParentId = 0;
+            bankDetailsModel.ParentEmail = "";
+            bankDetailsModel.BankName = "";
+            bankDetailsModel.BranchName = "";
+            bankDetailsModel.BranchAddress = "";
+            bankDetailsModel.AccountHolderName = "";
+            bankDetailsModel.AccountNumber = "";
+            bankDetailsModel.AccountType = "";
+            bankDetailsModel.SwiftOrBicCode = "";
+            bankDetailsModel.CurrencyCode = "";
+        }
+        else
+        {
+            bankDetailsModel.Id = bankDetails.Id;
+            bankDetailsModel.ParentId = bankDetails.ParentId;
+            bankDetailsModel.ParentEmail = bankDetails.ParentEmail;
+            bankDetailsModel.BankName = bankDetails.BankName;
+            bankDetailsModel.BranchName = bankDetails.BranchName;
+            bankDetailsModel.BranchAddress = bankDetails.BranchAddress;
+            bankDetailsModel.AccountHolderName = bankDetails.AccountHolderName;
+            bankDetailsModel.AccountNumber = bankDetails.AccountNumber;
+            bankDetailsModel.AccountType = bankDetails.AccountType;
+            bankDetailsModel.SwiftOrBicCode = bankDetails.SwiftOrBicCode;
+            bankDetailsModel.CurrencyCode = bankDetails.CurrencyCode;
+        }
+
         model.ParentChildLineStatsModel = stats;
         model.ParentChildSumOrderStatsModel = sumOrder;
+        model.ParentBankDetailsModel = bankDetailsModel;
 
         return View(model);
     }
@@ -1523,6 +1560,189 @@ public partial class CustomerController : BasePublicController
             else
             {
                 return Json(new { error = "Unsuccessfully added your new (Line 2) downline. Please contact admin." });
+            }
+        }
+        catch (Exception ex)
+        {
+            return Json(new { error = ex.Message });
+        }
+    }
+
+
+    [HttpPost]
+    public virtual async Task<IActionResult> SaveBankDetails(string modelUsername, string modelEmail, string bankName, string branchName, 
+                                                            string branchAddress, string accountHolderName, string accountNumber, string accountType,
+                                                            string swiftOrBicCode)
+    {
+        try
+        {
+            // Validate bank name is null or empty
+            if (string.IsNullOrWhiteSpace(bankName))
+            {
+                return Json(new { error = "Bank Name is required." });
+            }
+
+            // Validate bank branch name is null or empty
+            if (string.IsNullOrWhiteSpace(branchName))
+            {
+                return Json(new { error = "Bank Branch Name is required." });
+            }
+
+            // Validate bank branch address is null or empty
+            if (string.IsNullOrWhiteSpace(branchAddress))
+            {
+                return Json(new { error = "Bank Branch Address is required." });
+            }
+
+            // Validate bank account holder name is null or empty
+            if (string.IsNullOrWhiteSpace(accountHolderName))
+            {
+                return Json(new { error = "Bank Account Holder Name is required." });
+            }
+
+            // Validate bank account number is null or empty
+            if (string.IsNullOrWhiteSpace(accountNumber))
+            {
+                return Json(new { error = "Bank Account Number is required." });
+            }
+
+            // Validate bank account type is null or empty
+            if (string.IsNullOrWhiteSpace(accountType))
+            {
+                return Json(new { error = "Bank Account Type is required." });
+            }
+
+            // Validate bank swift/ bic code is null or empty
+            if (string.IsNullOrWhiteSpace(swiftOrBicCode))
+            {
+                return Json(new { error = "Bank Swift/ BIC Code is required." });
+            }
+
+            var modelCustomer = new Customer();
+            if (string.IsNullOrEmpty(modelUsername))
+                modelCustomer = await _customerService.GetCustomerByEmailAsync(modelEmail);
+            else
+                modelCustomer = await _customerService.GetCustomerByUsernameAndEmailAsync(modelUsername, modelEmail);
+
+            var bankDetails = new ParentBankDetails
+            {
+                ParentId = modelCustomer.Id,
+                ParentEmail = modelEmail,
+                BankName = bankName,
+                BranchName = branchName,
+                BranchAddress = branchAddress,
+                AccountHolderName = accountHolderName,
+                AccountNumber = accountNumber,
+                AccountType = accountType,
+                SwiftOrBicCode = swiftOrBicCode,
+                CurrencyCode = "JPY",
+                CreatedDateTimeUtc = DateTime.UtcNow,
+            };
+
+
+            var insertedId = await _parentBankDetailsService.InsertParentBankDetailsAsync(bankDetails);
+
+            if (insertedId > 0)
+            {
+                return Json(new
+                {
+                    message = "You had successfully added your bank details."                    
+                });
+            }
+            else
+            {
+                return Json(new { error = "Failed to add your bank details." });
+            }
+        }
+        catch (Exception ex)
+        {
+            return Json(new { error = ex.Message });
+        }
+    }
+
+
+    [HttpPost]
+    public virtual async Task<IActionResult> EditBankDetails(string modelUsername, string modelEmail, string bankName, string branchName,
+                                                            string branchAddress, string accountHolderName, string accountNumber, string accountType,
+                                                            string swiftOrBicCode)
+    {
+        try
+        {
+            // Validate bank name is null or empty
+            if (string.IsNullOrWhiteSpace(bankName))
+            {
+                return Json(new { error = "Bank Name is required." });
+            }
+
+            // Validate bank branch name is null or empty
+            if (string.IsNullOrWhiteSpace(branchName))
+            {
+                return Json(new { error = "Bank Branch Name is required." });
+            }
+
+            // Validate bank branch address is null or empty
+            if (string.IsNullOrWhiteSpace(branchAddress))
+            {
+                return Json(new { error = "Bank Branch Address is required." });
+            }
+
+            // Validate bank account holder name is null or empty
+            if (string.IsNullOrWhiteSpace(accountHolderName))
+            {
+                return Json(new { error = "Bank Account Holder Name is required." });
+            }
+
+            // Validate bank account number is null or empty
+            if (string.IsNullOrWhiteSpace(accountNumber))
+            {
+                return Json(new { error = "Bank Account Number is required." });
+            }
+
+            // Validate bank account type is null or empty
+            if (string.IsNullOrWhiteSpace(accountType))
+            {
+                return Json(new { error = "Bank Account Type is required." });
+            }
+
+            // Validate bank swift/ bic code is null or empty
+            if (string.IsNullOrWhiteSpace(swiftOrBicCode))
+            {
+                return Json(new { error = "Bank Swift/ BIC Code is required." });
+            }
+
+            var modelCustomer = new Customer();
+            if (string.IsNullOrEmpty(modelUsername))
+                modelCustomer = await _customerService.GetCustomerByEmailAsync(modelEmail);
+            else
+                modelCustomer = await _customerService.GetCustomerByUsernameAndEmailAsync(modelUsername, modelEmail);
+
+            var bankDetails = new ParentBankDetails
+            {
+                ParentId = modelCustomer.Id,
+                ParentEmail = modelEmail,
+                BankName = bankName,
+                BranchName = branchName,
+                BranchAddress = branchAddress,
+                AccountHolderName = accountHolderName,
+                AccountNumber = accountNumber,
+                AccountType = accountType,
+                SwiftOrBicCode = swiftOrBicCode,
+                CurrencyCode = "JPY",
+                CreatedDateTimeUtc = DateTime.UtcNow,
+            };
+
+            var insertedId = await _parentBankDetailsService.UpdateParentBankDetailsAsync(bankDetails);
+
+            if (insertedId > 0)
+            {
+                return Json(new
+                {
+                    message = "You had successfully updated your bank details."
+                });
+            }
+            else
+            {
+                return Json(new { error = "Failed to uodate your bank details." });
             }
         }
         catch (Exception ex)

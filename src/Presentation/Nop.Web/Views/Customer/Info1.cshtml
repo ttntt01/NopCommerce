@@ -16,6 +16,29 @@
     @await Component.InvokeAsync(typeof(CustomerNavigationViewComponent), new { selectedTabId = CustomerNavigationEnum.Commission })
 }
 
+
+<style>
+    .button-1:disabled {
+        cursor: not-allowed !important;
+        opacity: 0.6 !important;
+        pointer-events: none !important;
+        transition: opacity 0.3s ease;
+    }
+
+    .button-1 {
+        transition: background-color 0.3s ease, opacity 0.3s ease;
+    }
+
+    input[disabled] {
+        background-color: #f0f0f0 !important;
+        color: #555 !important;
+    }
+
+    input:not([disabled]) {
+        background-color: #ffffff !important;
+    }
+</style>
+
 <script type="text/javascript">
     const today = new Date();
     const year = today.getFullYear();
@@ -58,6 +81,34 @@
     document.getElementById('salary-month').innerText = `${year1}/${formattedMonth}`;
 </script>
 
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const emailInput = document.getElementById("ParentEmail");
+        const editBtn = document.getElementById("editBank");
+        const saveBtn = document.getElementById("saveBank");
+
+        // When clicking Edit/Update
+        editBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            emailInput.disabled = false;
+            emailInput.style.backgroundColor = "#ffffff";
+
+            editBtn.disabled = true;
+            saveBtn.disabled = false;
+        });
+
+        // When clicking Save
+        saveBtn.addEventListener("click", function () {
+            emailInput.disabled = true;
+            emailInput.style.backgroundColor = "#f0f0f0";
+
+            editBtn.disabled = false;
+            saveBtn.disabled = true;
+        });
+    });
+</script>
+
 <div class="page account-page customer-info-page">
     <div class="page-title">
         @* <h1>@T("Account.MyAccount") - @T("Account.CustomerInfo")</h1> *@
@@ -66,131 +117,216 @@
     <div class="page-body">
         @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.CustomerInfoTop, additionalData = Model })
         @* <form asp-route="MyForm" method="post"> *@
-            <div asp-validation-summary="ModelOnly" class="message-error"></div>
-            <div class="fieldset">
-                <div class="title">
-                    @* <strong>@T("Account.YourPersonalDetails")</strong> *@
-                    <strong>Your commission</strong>
-                    </br>
-                        <label style="color:red; font-size: 13px">
-                            * Commission will be updated by every end of the month:
-                            <span style="color:#777777; font-weight: bold; font-style: italic" id="lastDay-month"></span>
-                        </label>
-                    </br>
-                        <label style="color:red; font-size: 13px">
-                            * Commissions for the previous month will be paid within the first 5 working business days of this month.
-                        </label>
-                    </br>
-                        <label style="color:red; font-size: 13px">
-                            * Please check your commission payment status starting from:
-                            <span style="color:#777777; font-weight: bold; font-style: italic" id="firstDayNext-month"></span>
-                        </label>
-                </div>
-                <div class="form-fields">
-                    <!-- Salary Month at Top -->
-                    <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;" id="salary-month"></div>
-
-                    <div class="inputs" style="overflow: hidden; padding: 5px 0;">
-                        <!-- Left: Paid Status -->
-                        @if (Model.ParentChildSumOrderStatsModel.IsPaid)
-                        {
-                            <div style="float: left; font-weight: bold; font-size: 16px; color: green;" id="paid-status">
-                                ✔ Paid
-                            </div>
-                        }
-                        else
-                        {                
-                            <div style="float: left; font-weight: bold; font-size: 16px; color: red;" id="paid-status">
-                                ✖ Not Paid
-                            </div>        
-                        }
-
-                        @{
-                            var payAmt = Model.ParentChildSumOrderStatsModel.PayAmount;
-                        }
-                        <!-- Right: Total Salary -->                        
-                        <div style="float: right; font-weight: bold; font-size: 16px;">
-                        <div id="salary-month" style="font-size: 14px;"></div>
-                            Total Salary: ¥ <span id="total-salary">@payAmt</span>
-                        </div>
-                    </div>
-                </div>
+        <div asp-validation-summary="ModelOnly" class="message-error"></div>
+        <div class="fieldset">
+            <div class="title">
+                @* <strong>@T("Account.YourPersonalDetails")</strong> *@
+                <strong>Your commission</strong>
                 </br>
-                <div class="title">
-                    @* <strong>@T("Account.YourPersonalDetails")</strong> *@
-                    <strong>Your downline registration</strong>
-                </div>
-                <div class="form-fields">
-                    <div class="inputs">
-                        <label asp-for="Email" asp-postfix=":"></label>
-                        <input asp-for="Email" autocomplete="off" value="" />
-                        <nop-required />
-                        @* <span asp-validation-for="Email"></span> *@
-                        <span id="error"></span>
-                    </div>
-                 </div>
+                <label style="color:red; font-size: 13px">
+                    * Commission will be updated by every end of the month:
+                    <span style="color:#777777; font-weight: bold; font-style: italic" id="lastDay-month"></span>
+                </label>
                 </br>
-                <div class="buttons">
-                    <button type="submit" id="save" name="save" class="button-1 save-customer-info-button">@T("Common.Save")</button>
-                </div>
-                <div class="title">
-                    @* <strong>@T("Account.YourPersonalDetails")</strong> *@
-                    <strong>Total downline count</strong>
-                    </br>
-                        <label style="color:red; font-size: 13px">* New added downline will be reflected by end of the day. Please come back and check by tomorrow.</label>
-                    </br>
-                    @{
-                        var lastUpdatedTimeUtc = Model.ParentChildLineStatsModel.FirstOrDefault()?.LastUpdatedTimeUtc;
-                        var lastUpdatedLocal = lastUpdatedTimeUtc.HasValue
-                        ? TimeZoneInfo.ConvertTimeFromUtc(lastUpdatedTimeUtc.Value, TimeZoneInfo.Local)
-                            : (DateTime?)null;
-                    }
-                    @if (Model.ParentChildLineStatsModel.FirstOrDefault().Id > 0)
+                <label style="color:red; font-size: 13px">
+                    * Commissions for the previous month will be paid within the first 5 working business days of this month.
+                </label>
+                </br>
+                <label style="color:red; font-size: 13px">
+                    * Please check your commission payment status starting from:
+                    <span style="color:#777777; font-weight: bold; font-style: italic" id="firstDayNext-month"></span>
+                </label>
+            </div>
+            <div class="form-fields">
+                <!-- Salary Month at Top -->
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;" id="salary-month"></div>
+
+                <div class="inputs" style="overflow: hidden; padding: 5px 0;">
+                    <!-- Left: Paid Status -->
+                    @if (Model.ParentChildSumOrderStatsModel.IsPaid)
                     {
-                        <label style="color:red; font-size: 13px">* Latest total downline count updated at: <span style="color:#777777; font-weight: bold; font-style: italic">@lastUpdatedLocal.Value.ToString("yyyy-MM-dd HH:mm:ss")</span></label>
+                        <div style="float: left; font-weight: bold; font-size: 16px; color: green;" id="paid-status">
+                            ✔ Paid
+                        </div>
                     }
                     else
                     {
-                        <label style="color:red; font-size: 13px">* 👀 No downlines spotted! It’s just you and... you. Time to call your friends, cousins, etc — let’s build your team! 🚀</label>
+                        <div style="float: left; font-weight: bold; font-size: 16px; color: red;" id="paid-status">
+                            ✖ Not Paid
+                        </div>
                     }
-            </div>
-                <div class="form-fields">
-                    <div class="inputs">
-                        <table style="width: 100%; border-collapse: collapse; border: 1px solid black; background-color: #f0f0f0;">
-                            <thead style="background-color: #d0d0d0; height: 25px">
-                                <tr>
-                                    <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 1 (4%)</label></th>
-                                    <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 2 (2%)</label></th>
-                                    <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 3 (1%)</label></th>
-                                    <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 4 (0.5%)</label></th>
-                                </tr>
-                            </thead>
-                            <tbody style="height: 35px">
-                                @{
-                                    var level1 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 1)?.ChildCount ?? 0;
-                                    var level2 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 2)?.ChildCount ?? 0;
-                                    var level3 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 3)?.ChildCount ?? 0;
-                                    var level4 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 4)?.ChildCount ?? 0;
-                                }
-                                <tr>
-                                    <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
-                                        <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level1</b></label>
-                                    </td>
-                                    <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
-                                        <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level2</b></label>
-                                    </td>
-                                    <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
-                                        <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level3</b></label>
-                                    </td>
-                                    <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
-                                        <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level4</b></label>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                    @{
+                        var payAmt = Model.ParentChildSumOrderStatsModel.PayAmount;
+                    }
+                    <!-- Right: Total Salary -->
+                    <div style="float: right; font-weight: bold; font-size: 16px;">
+                        <div id="salary-month" style="font-size: 14px;"></div>
+                        Total Salary: ¥ <span id="total-salary">@payAmt</span>
                     </div>
                 </div>
             </div>
+            </br>
+            <div class="title">
+                @* <strong>@T("Account.YourPersonalDetails")</strong> *@
+                <strong>Your downline registration</strong>
+            </div>
+            <div class="form-fields">
+                <div class="inputs">
+                    <label asp-for="Email" asp-postfix=":"></label>
+                    <input asp-for="Email" autocomplete="off" value="" />
+                    <nop-required />
+                    @* <span asp-validation-for="Email"></span> *@
+                    <span id="error"></span>
+                </div>
+            </div>
+            </br>
+            <div class="buttons">
+                <button type="submit" id="save" name="save" class="button-1 save-customer-info-button">@T("Common.Save")</button>
+            </div>
+            <div class="title">
+                @* <strong>@T("Account.YourPersonalDetails")</strong> *@
+                <strong>Total downline count</strong>
+                </br>
+                <label style="color:red; font-size: 13px">* New added downline will be reflected by end of the day. Please come back and check by tomorrow.</label>
+                </br>
+                @{
+                    var lastUpdatedTimeUtc = Model.ParentChildLineStatsModel.FirstOrDefault()?.LastUpdatedTimeUtc;
+                    var lastUpdatedLocal = lastUpdatedTimeUtc.HasValue
+                    ? TimeZoneInfo.ConvertTimeFromUtc(lastUpdatedTimeUtc.Value, TimeZoneInfo.Local)
+                    : (DateTime?)null;
+                }
+                @if (Model.ParentChildLineStatsModel.FirstOrDefault().Id > 0)
+                {
+                    <label style="color:red; font-size: 13px">* Latest total downline count updated at: <span style="color:#777777; font-weight: bold; font-style: italic">@lastUpdatedLocal.Value.ToString("yyyy-MM-dd HH:mm:ss")</span></label>
+                }
+                else
+                {
+                    <label style="color:red; font-size: 13px">* 👀 No downlines spotted! It’s just you and... you. Time to call your friends, cousins, etc — let’s build your team! 🚀</label>
+                }
+            </div>
+            <div class="form-fields">
+                <div class="inputs">
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid black; background-color: #f0f0f0;">
+                        <thead style="background-color: #d0d0d0; height: 25px">
+                            <tr>
+                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 1 (4%)</label></th>
+                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 2 (2%)</label></th>
+                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 3 (1%)</label></th>
+                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 4 (0.5%)</label></th>
+                            </tr>
+                        </thead>
+                        <tbody style="height: 35px">
+                            @{
+                                var level1 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 1)?.ChildCount ?? 0;
+                                var level2 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 2)?.ChildCount ?? 0;
+                                var level3 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 3)?.ChildCount ?? 0;
+                                var level4 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 4)?.ChildCount ?? 0;
+                            }
+                            <tr>
+                                <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                    <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level1</b></label>
+                                </td>
+                                <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                    <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level2</b></label>
+                                </td>
+                                <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                    <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level3</b></label>
+                                </td>
+                                <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                    <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level4</b></label>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </br></br>
+            <div class="title">
+                @* <strong>@T("Account.YourPersonalDetails")</strong> *@
+                <strong>Your bank details</strong>
+                </br>
+                <label style="color:red; font-size: 13px">* Hi @Model.Username, we will be transferring commission to your bank account from Malaysia, and we need your full banking details to complete the international transfer. Could you kindly provide us with the following information: </label>
+                </br>
+            </div>
+            <div class="form-fields">
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.ParentEmail" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.ParentEmail" autocomplete="off" value="" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.BankName" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.BankName" autocomplete="off" value="" />
+                    <nop-required />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.BranchName" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.BranchName" autocomplete="off" value="" />
+                    <nop-required />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.BranchAddress" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.BranchAddress" autocomplete="off" value="" />
+                    <nop-required />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.AccountHolderName" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.AccountHolderName" autocomplete="off" value="" />
+                    <nop-required />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.AccountNumber" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.AccountNumber" autocomplete="off" value="" />
+                    <nop-required />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.AccountType" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.AccountType" autocomplete="off" value="" />
+                    <nop-required />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.SwiftOrBicCode" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.SwiftOrBicCode" autocomplete="off" value="" />
+                    <nop-required />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.CurrencyCode" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.CurrencyCode" autocomplete="off" value="" />
+                    <nop-required />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" autocomplete="off" value="" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
+                </div>
+                <div class="inputs">
+                    <label asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" asp-postfix=":"></label>
+                    <input asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" class="input-gray" autocomplete="off" value="" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
+                </div>
+                <div class="inputs">
+                    <span id="error1"></span>
+                </div>
+            </div>
+            </br>
+            <div class="buttons">
+                <!-- Edit/Update button -->
+                <button type="submit"
+                        id="editBank"
+                        name="edit"
+                        class="button-1 edit-customer-bank-info-button"
+                @(string.IsNullOrEmpty(Model.ParentBankDetailsModel?.ParentEmail) ? "disabled" : "")>
+                    @(string.IsNullOrEmpty(Model.ParentBankDetailsModel?.ParentEmail) ? @T("Common.Edit") : @T("Common.Update"))
+                </button>
+
+                <!-- Save button -->
+                <button type="submit"
+                        id="saveBank"
+                        name="save"
+                        class="button-1 save-customer-bank-info-button"
+                @(string.IsNullOrEmpty(Model.ParentBankDetailsModel?.ParentEmail) ? "" : "disabled")>
+                    @T("Common.Save")
+                </button>
+            </div>
+        </div>
         @* </form> *@
         @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.CustomerInfoBottom, additionalData = Model })
     </div>
@@ -208,7 +344,7 @@
                 modelUsername: modelUsername,
                 modelEmail: modelEmail
             };
-            addAntiForgeryToken(postData);                         
+            addAntiForgeryToken(postData);
 
             $.ajax({
                 cache: false,
