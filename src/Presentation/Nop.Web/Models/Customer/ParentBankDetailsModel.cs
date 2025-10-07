@@ -43,4 +43,6 @@ public partial record ParentBankDetailsModel : BaseNopModel
 
     [NopResourceDisplayName("Account.Comission.Fields.LastUpdatedTimeUtc")]
     public string LastUpdatedTimeUtc { get; set; }
+
+    public string ModelUsername { get; set; }   
 }

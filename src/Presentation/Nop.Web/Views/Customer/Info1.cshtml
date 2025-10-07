@@ -1,5 +1,6 @@
 ﻿@using Nop.Core
 @model CustomerInfoModel
+@Html.AntiForgeryToken()
 @inject Nop.Core.IWebHelper webHelper
 @{
     Layout = "_ColumnsTwo";
@@ -252,55 +253,54 @@
             <div class="form-fields">
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.ParentEmail" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.ParentEmail" autocomplete="off" value="" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
+                    <input asp-for="ParentBankDetailsModel.ParentEmail" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.BankName" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.BankName" autocomplete="off" value="" />
+                    <input asp-for="ParentBankDetailsModel.BankName" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.BranchName" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.BranchName" autocomplete="off" value="" />
+                    <input asp-for="ParentBankDetailsModel.BranchName" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.BranchAddress" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.BranchAddress" autocomplete="off" value="" />
+                    <input asp-for="ParentBankDetailsModel.BranchAddress" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.AccountHolderName" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.AccountHolderName" autocomplete="off" value="" />
+                    <input asp-for="ParentBankDetailsModel.AccountHolderName" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.AccountNumber" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.AccountNumber" autocomplete="off" value="" />
+                    <input asp-for="ParentBankDetailsModel.AccountNumber" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.AccountType" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.AccountType" autocomplete="off" value="" />
+                    <input asp-for="ParentBankDetailsModel.AccountType" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.SwiftOrBicCode" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.SwiftOrBicCode" autocomplete="off" value="" />
+                    <input asp-for="ParentBankDetailsModel.SwiftOrBicCode" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.CurrencyCode" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.CurrencyCode" autocomplete="off" value="" />
-                    <nop-required />
+                    <input asp-for="ParentBankDetailsModel.CurrencyCode" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />                    
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" autocomplete="off" value="" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
+                    <input asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" class="input-gray" autocomplete="off" value="" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
+                    <input asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
                 </div>
                 <div class="inputs">
                     <span id="error1"></span>
@@ -313,8 +313,8 @@
                         id="editBank"
                         name="edit"
                         class="button-1 edit-customer-bank-info-button"
-                @(string.IsNullOrEmpty(Model.ParentBankDetailsModel?.ParentEmail) ? "disabled" : "")>
-                    @(string.IsNullOrEmpty(Model.ParentBankDetailsModel?.ParentEmail) ? @T("Common.Edit") : @T("Common.Update"))
+                        @(string.IsNullOrEmpty(Model.ParentBankDetailsModel?.ParentEmail) ? "disabled" : "")>
+                        @T("Common.Edit")
                 </button>
 
                 <!-- Save button -->
@@ -322,8 +322,8 @@
                         id="saveBank"
                         name="save"
                         class="button-1 save-customer-bank-info-button"
-                @(string.IsNullOrEmpty(Model.ParentBankDetailsModel?.ParentEmail) ? "" : "disabled")>
-                    @T("Common.Save")
+                        @(string.IsNullOrEmpty(Model.ParentBankDetailsModel?.ParentEmail) ? "" : "disabled")>
+                        @T("Common.Save")
                 </button>
             </div>
         </div>
@@ -333,7 +333,7 @@
 </div>
 
 <script asp-location="Footer">
-    $(function () {
+    $(function () {        
         $('#save').on('click', function () {
             var email = $('input[name="Email"]').val();
             var modelUsername = "@Model.Username";
@@ -349,7 +349,7 @@
             $.ajax({
                 cache: false,
                 type: "POST",
-                url: "@Url.RouteUrl("CustomerInfo1")",
+                url: "@Url.Action("SaveLevel2Child", "Customer")", // your controller route
                 data: postData,
                 dataType: "json",
                 success: function (data, textStatus, jqXHR) {
@@ -368,6 +368,62 @@
                             .css("color", "green");
 
                         //location.href = data.redirect;
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Request failed: " + jqXHR.responseText);
+                }
+            });
+        });
+    });
+
+
+
+    $(function () {        
+        $('#saveBank').on('click', function (e) {
+            e.preventDefault(); // Prevent normal form submission
+
+            // ✅ Collect values from your inputs
+            var postData = {
+                BankName: $('input[name="ParentBankDetailsModel.BankName"]').val(),
+                BranchName: $('input[name="ParentBankDetailsModel.BranchName"]').val(),
+                BranchAddress: $('input[name="ParentBankDetailsModel.BranchAddress"]').val(),
+                AccountHolderName: $('input[name="ParentBankDetailsModel.AccountHolderName"]').val(),
+                AccountNumber: $('input[name="ParentBankDetailsModel.AccountNumber"]').val(),
+                AccountType: $('input[name="ParentBankDetailsModel.AccountType"]').val(),
+                SwiftOrBicCode: $('input[name="ParentBankDetailsModel.SwiftOrBicCode"]').val(),
+                CurrencyCode: $('input[name="ParentBankDetailsModel.CurrencyCode"]').val(),
+                ParentEmail: $('input[name="ParentBankDetailsModel.ParentEmail"]').val(),
+                // Optional extra data
+                ModelUsername: "@Model.Username",
+                ParentEmail: "@Model.Email"
+            };
+            // ✅ Add AntiForgeryToken
+            addAntiForgeryToken(postData);
+
+            // ✅ Send to backend
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@Url.Action("SaveBankDetails", "Customer")", // your controller route
+                data: postData,
+                dataType: "json",
+                success: function (data) {
+                    if (data.error) {
+                        $('#error1')
+                            .text(data.error)
+                            .addClass("field-validation-error")
+                            .removeClass("field-validation-valid")
+                            .css("color", "red");
+                    } else {
+                        $('#error1')
+                            .text(data.message)
+                            .removeClass("field-validation-error")
+                            .addClass("field-validation-valid")
+                            .css("color", "green");
+
+                        // Optional redirect if backend returns redirect url
+                        // if (data.redirect) location.href = data.redirect;
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {

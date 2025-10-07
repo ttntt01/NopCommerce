@@ -60,6 +60,6 @@ public partial class ParentBankDetails : BaseEntity
     /// <summary>
     /// Gets or sets the LastUpdatedTimeUtc
     /// </summary>
-    public DateTime LastUpdatedTimeUtc { get; set; }
+    public DateTime? LastUpdatedTimeUtc { get; set; }
 }
 
