@@ -19,24 +19,29 @@
 
 
 <style>
-    .button-1:disabled {
-        cursor: not-allowed !important;
-        opacity: 0.6 !important;
-        pointer-events: none !important;
-        transition: opacity 0.3s ease;
+    /* high-specificity lock: make disabled buttons look & act disabled */
+    button.button-1[disabled],
+    button.button-1:disabled,
+    .button-1[disabled] {
+        pointer-events: none !important; /* prevent clicks */
+        cursor: not-allowed !important; /* not-allowed cursor */
+        opacity: 0.6 !important; /* faded look */
     }
 
-    .button-1 {
-        transition: background-color 0.3s ease, opacity 0.3s ease;
-    }
+        /* extra to catch any theme override that sets pointer-events: auto */
+        button.button-1[disabled] * {
+            pointer-events: none !important;
+        }
 
     input[disabled] {
         background-color: #f0f0f0 !important;
         color: #555 !important;
+        border: 1px solid #ccc !important;
     }
 
-    input:not([disabled]) {
-        background-color: #ffffff !important;
+    button.updating {
+        background-color: #28a745 !important;
+        color: white !important;
     }
 </style>
 
@@ -85,27 +90,45 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const emailInput = document.getElementById("ParentEmail");
+        const inputs = document.querySelectorAll(".bank-input");
         const editBtn = document.getElementById("editBank");
-        const saveBtn = document.getElementById("saveBank");
 
-        // When clicking Edit/Update
-        editBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            emailInput.disabled = false;
-            emailInput.style.backgroundColor = "#ffffff";
-
-            editBtn.disabled = true;
-            saveBtn.disabled = false;
+        // Check if all inputs have values => disable & gray them
+        let allHaveValues = true;
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                allHaveValues = false;
+            }
         });
 
-        // When clicking Save
-        saveBtn.addEventListener("click", function () {
-            emailInput.disabled = true;
-            emailInput.style.backgroundColor = "#f0f0f0";
+        if (allHaveValues) {
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+        }
 
-            editBtn.disabled = false;
-            saveBtn.disabled = true;
+        // Edit / Update button logic
+        editBtn.addEventListener("click", function () {
+            if (editBtn.textContent.trim().toLowerCase() === "edit") {
+                // Enable inputs
+                inputs.forEach(input => input.disabled = false);
+
+                // Change button text to Update
+                editBtn.textContent = "Update";
+
+                // Optionally change color to highlight update mode
+                editBtn.classList.add("updating");
+            } else {
+                // Submit the form manually if needed
+                // document.querySelector("form").submit();
+
+                // Disable inputs again after updating
+                inputs.forEach(input => input.disabled = true);
+
+                // Change back button text
+                editBtn.textContent = "Edit";
+                editBtn.classList.remove("updating");
+            }
         });
     });
 </script>
@@ -257,37 +280,37 @@
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.BankName" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.BankName" autocomplete="off" />
+                    <input asp-for="ParentBankDetailsModel.BankName" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.BranchName" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.BranchName" autocomplete="off" />
+                    <input asp-for="ParentBankDetailsModel.BranchName" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.BranchAddress" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.BranchAddress" autocomplete="off" />
+                    <input asp-for="ParentBankDetailsModel.BranchAddress" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.AccountHolderName" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.AccountHolderName" autocomplete="off" />
+                    <input asp-for="ParentBankDetailsModel.AccountHolderName" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.AccountNumber" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.AccountNumber" autocomplete="off" />
+                    <input asp-for="ParentBankDetailsModel.AccountNumber" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.AccountType" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.AccountType" autocomplete="off" />
+                    <input asp-for="ParentBankDetailsModel.AccountType" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.SwiftOrBicCode" asp-postfix=":"></label>
-                    <input asp-for="ParentBankDetailsModel.SwiftOrBicCode" autocomplete="off" />
+                    <input asp-for="ParentBankDetailsModel.SwiftOrBicCode" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
