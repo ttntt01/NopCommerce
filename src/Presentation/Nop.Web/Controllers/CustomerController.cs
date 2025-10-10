@@ -1667,73 +1667,73 @@ public partial class CustomerController : BasePublicController
 
 
     [HttpPost]
-    public virtual async Task<IActionResult> EditBankDetails(string modelUsername, string modelEmail, string bankName, string branchName,
-                                                            string branchAddress, string accountHolderName, string accountNumber, string accountType,
-                                                            string swiftOrBicCode)
+    public virtual async Task<IActionResult> EditBankDetails(ParentBankDetailsModel model)
     {
         try
         {
             // Validate bank name is null or empty
-            if (string.IsNullOrWhiteSpace(bankName))
+            if (string.IsNullOrWhiteSpace(model.BankName))
             {
                 return Json(new { error = "Bank Name is required." });
             }
 
             // Validate bank branch name is null or empty
-            if (string.IsNullOrWhiteSpace(branchName))
+            if (string.IsNullOrWhiteSpace(model.BranchName))
             {
                 return Json(new { error = "Bank Branch Name is required." });
             }
 
             // Validate bank branch address is null or empty
-            if (string.IsNullOrWhiteSpace(branchAddress))
+            if (string.IsNullOrWhiteSpace(model.BranchAddress))
             {
                 return Json(new { error = "Bank Branch Address is required." });
             }
 
             // Validate bank account holder name is null or empty
-            if (string.IsNullOrWhiteSpace(accountHolderName))
+            if (string.IsNullOrWhiteSpace(model.AccountHolderName))
             {
                 return Json(new { error = "Bank Account Holder Name is required." });
             }
 
             // Validate bank account number is null or empty
-            if (string.IsNullOrWhiteSpace(accountNumber))
+            if (string.IsNullOrWhiteSpace(model.AccountNumber))
             {
                 return Json(new { error = "Bank Account Number is required." });
             }
 
             // Validate bank account type is null or empty
-            if (string.IsNullOrWhiteSpace(accountType))
+            if (string.IsNullOrWhiteSpace(model.AccountType))
             {
                 return Json(new { error = "Bank Account Type is required." });
             }
 
             // Validate bank swift/ bic code is null or empty
-            if (string.IsNullOrWhiteSpace(swiftOrBicCode))
+            if (string.IsNullOrWhiteSpace(model.SwiftOrBicCode))
             {
                 return Json(new { error = "Bank Swift/ BIC Code is required." });
             }
 
             var modelCustomer = new Customer();
-            if (string.IsNullOrEmpty(modelUsername))
-                modelCustomer = await _customerService.GetCustomerByEmailAsync(modelEmail);
+            if (string.IsNullOrEmpty(model.ModelUsername))
+                modelCustomer = await _customerService.GetCustomerByEmailAsync(model.ParentEmail);
             else
-                modelCustomer = await _customerService.GetCustomerByUsernameAndEmailAsync(modelUsername, modelEmail);
+                modelCustomer = await _customerService.GetCustomerByUsernameAndEmailAsync(model.ModelUsername, model.ParentEmail);
 
             var bankDetails = new ParentBankDetails
             {
+                Id = model.Id,
                 ParentId = modelCustomer.Id,
-                ParentEmail = modelEmail,
-                BankName = bankName,
-                BranchName = branchName,
-                BranchAddress = branchAddress,
-                AccountHolderName = accountHolderName,
-                AccountNumber = accountNumber,
-                AccountType = accountType,
-                SwiftOrBicCode = swiftOrBicCode,
+                ParentEmail = model.ParentEmail,
+                BankName = model.BankName,
+                BranchName = model.BranchName,
+                BranchAddress = model.BranchAddress,
+                AccountHolderName = model.AccountHolderName,
+                AccountNumber = model.AccountNumber,
+                AccountType = model.AccountType,
+                SwiftOrBicCode = model.SwiftOrBicCode,
                 CurrencyCode = "JPY",
-                CreatedDateTimeUtc = DateTime.UtcNow,
+                CreatedDateTimeUtc = DateTime.Parse(model.CreatedDateTimeUtc),
+                LastUpdatedTimeUtc = DateTime.UtcNow,
             };
 
             var insertedId = await _parentBankDetailsService.UpdateParentBankDetailsAsync(bankDetails);
@@ -1742,12 +1742,12 @@ public partial class CustomerController : BasePublicController
             {
                 return Json(new
                 {
-                    message = "You had successfully updated your bank details."
+                    message = "You have successfully updated your bank details."
                 });
             }
             else
             {
-                return Json(new { error = "Failed to uodate your bank details." });
+                return Json(new { error = "Failed to update your bank details." });
             }
         }
         catch (Exception ex)

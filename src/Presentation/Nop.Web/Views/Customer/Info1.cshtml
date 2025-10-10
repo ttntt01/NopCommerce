@@ -28,11 +28,12 @@
         opacity: 0.6 !important; /* faded look */
     }
 
-        /* extra to catch any theme override that sets pointer-events: auto */
-        button.button-1[disabled] * {
-            pointer-events: none !important;
-        }
+    /* extra to catch any theme override that sets pointer-events: auto */
+    button.button-1[disabled] * {
+        pointer-events: none !important;
+    }
 
+    /* --- Disabled Input Styling --- */
     input[disabled] {
         background-color: #f0f0f0 !important;
         color: #555 !important;
@@ -42,6 +43,18 @@
     button.updating {
         background-color: #28a745 !important;
         color: white !important;
+    }
+
+    /* Optional: Cancel Button */
+    .cancel-edit {
+        display: none;
+        margin-left: 8px;
+        background-color: #dc3545 !important;
+        color: white !important;
+    }
+
+    .cancel-edit.visible {
+        display: inline-block !important;
     }
 </style>
 
@@ -87,51 +100,6 @@
     document.getElementById('salary-month').innerText = `${year1}/${formattedMonth}`;
 </script>
 
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const inputs = document.querySelectorAll(".bank-input");
-        const editBtn = document.getElementById("editBank");
-
-        // Check if all inputs have values => disable & gray them
-        let allHaveValues = true;
-        inputs.forEach(input => {
-            if (!input.value.trim()) {
-                allHaveValues = false;
-            }
-        });
-
-        if (allHaveValues) {
-            inputs.forEach(input => {
-                input.disabled = true;
-            });
-        }
-
-        // Edit / Update button logic
-        editBtn.addEventListener("click", function () {
-            if (editBtn.textContent.trim().toLowerCase() === "edit") {
-                // Enable inputs
-                inputs.forEach(input => input.disabled = false);
-
-                // Change button text to Update
-                editBtn.textContent = "Update";
-
-                // Optionally change color to highlight update mode
-                editBtn.classList.add("updating");
-            } else {
-                // Submit the form manually if needed
-                // document.querySelector("form").submit();
-
-                // Disable inputs again after updating
-                inputs.forEach(input => input.disabled = true);
-
-                // Change back button text
-                editBtn.textContent = "Edit";
-                editBtn.classList.remove("updating");
-            }
-        });
-    });
-</script>
 
 <div class="page account-page customer-info-page">
     <div class="page-title">
@@ -277,6 +245,8 @@
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.ParentEmail" asp-postfix=":"></label>
                     <input asp-for="ParentBankDetailsModel.ParentEmail" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
+                    <!-- Hidden field for backend -->
+                    <input type="hidden" id="IdHidden" name="ParentBankDetailsModel.Id" value="@Model.ParentBankDetailsModel?.Id" />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.BankName" asp-postfix=":"></label>
@@ -320,6 +290,8 @@
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" asp-postfix=":"></label>
                     <input asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
+                    <!-- Hidden field for backend -->
+                    <input type="hidden" id="CreatedDateTimeUtcHidden" name="ParentBankDetailsModel.CreatedDateTimeUtc" value="@Model.ParentBankDetailsModel?.CreatedDateTimeUtc" />
                 </div>
                 <div class="inputs">
                     <label asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" asp-postfix=":"></label>
@@ -340,7 +312,15 @@
                         @T("Common.Edit")
                 </button>
 
-                <!-- Save button -->
+                <!-- Cancel (hidden by default) -->
+                <button type="button"
+                        id="cancelEdit"
+                        class="button-1 cancel-customer-bank-info-button hidden"
+                        @(string.IsNullOrEmpty(Model.ParentBankDetailsModel?.ParentEmail) ? "disabled" : "")>
+                        @T("Common.Cancel")
+                </button>
+
+                <!-- Save (only for first-time entry) -->
                 <button type="submit"
                         id="saveBank"
                         name="save"
@@ -401,7 +381,6 @@
     });
 
 
-
     $(function () {        
         $('#saveBank').on('click', function (e) {
             e.preventDefault(); // Prevent normal form submission
@@ -453,6 +432,112 @@
                     alert("Request failed: " + jqXHR.responseText);
                 }
             });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputs = document.querySelectorAll(".bank-input");
+        const editBtn = document.getElementById("editBank");
+        const cancelBtn = document.getElementById("cancelEdit");
+        const saveBtn = document.getElementById("saveBank");
+
+        // --- Store original values for cancel ---
+        const originalValues = {};
+        inputs.forEach(input => {
+            originalValues[input.name] = input.value;
+        });
+
+        // --- Disable all inputs if already filled ---
+        const allHaveValues = Array.from(inputs).every(input => input.value.trim() !== "");
+        if (allHaveValues) {
+            inputs.forEach(input => input.disabled = true);
+            if (saveBtn) saveBtn.disabled = true;
+        }
+
+        // --- Edit / Update button ---
+        editBtn?.addEventListener("click", function (e) {
+            e.preventDefault(); // Prevent normal form submit
+            const isEditMode = editBtn.textContent.trim().toLowerCase() === "edit";
+
+            if (isEditMode) {
+                // ✅ Step 1: Switch to Update mode
+                inputs.forEach(input => input.disabled = false);
+                editBtn.textContent = "Update";
+                editBtn.classList.add("updating");
+                cancelBtn?.classList.add("visible");
+                if (saveBtn) saveBtn.disabled = true;
+            } else {
+                // ✅ Step 2: Call backend (Update)
+                const postData = {
+                    Id: $('input[name="ParentBankDetailsModel.Id"]').val(), // ✅ reads hidden input
+                    BankName: $('input[name="ParentBankDetailsModel.BankName"]').val(),
+                    BranchName: $('input[name="ParentBankDetailsModel.BranchName"]').val(),
+                    BranchAddress: $('input[name="ParentBankDetailsModel.BranchAddress"]').val(),
+                    AccountHolderName: $('input[name="ParentBankDetailsModel.AccountHolderName"]').val(),
+                    AccountNumber: $('input[name="ParentBankDetailsModel.AccountNumber"]').val(),
+                    AccountType: $('input[name="ParentBankDetailsModel.AccountType"]').val(),
+                    SwiftOrBicCode: $('input[name="ParentBankDetailsModel.SwiftOrBicCode"]').val(),
+                    CurrencyCode: $('input[name="ParentBankDetailsModel.CurrencyCode"]').val(),
+                    ParentEmail: $('input[name="ParentBankDetailsModel.ParentEmail"]').val(),
+                    CreatedDateTimeUtc: $('input[name="ParentBankDetailsModel.CreatedDateTimeUtc"]').val(), // ✅ reads hidden input
+                    ModelUsername: "@Model.Username",
+                    ModelEmail: "@Model.Email"
+                };
+
+                addAntiForgeryToken(postData);
+
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@Url.Action("EditBankDetails", "Customer")",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.error) {
+                            $('#error1')
+                                .text(data.error)
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        } else {
+                            $('#error1')
+                                .text(data.message)
+                                .removeClass("field-validation-error")
+                                .addClass("field-validation-valid")
+                                .css("color", "green");
+
+                            // ✅ Lock inputs after successful update
+                            inputs.forEach(input => {
+                                input.disabled = true;
+                                originalValues[input.name] = input.value;
+                            });
+
+                            editBtn.textContent = "Edit";
+                            editBtn.classList.remove("updating");
+                            cancelBtn?.classList.remove("visible");
+                            if (saveBtn) saveBtn.disabled = true;
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Request failed: " + jqXHR.responseText);
+                    }
+                });
+            }
+        });
+
+        // --- Cancel button ---
+        cancelBtn?.addEventListener("click", function () {
+            inputs.forEach(input => {
+                input.value = originalValues[input.name] || "";
+                input.disabled = true;
+            });
+
+            editBtn.textContent = "Edit";
+            editBtn.classList.remove("updating");
+            cancelBtn.classList.remove("visible");
+            if (saveBtn) saveBtn.disabled = true;
         });
     });
 </script>
