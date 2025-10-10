@@ -19,17 +19,19 @@ public partial class CommissionController : BaseAdminController
     protected readonly IPermissionService _permissionService;
     protected readonly ICommissionModelFctory _commissionModelFctory;
     protected readonly IParentChildSumOrderStatsService _parentChildSumOrderStatsService;
+    protected readonly IParentBankDetailsService _parentBankDetailsService;
 
     #endregion
 
 
     #region Ctor
 
-    public CommissionController(IPermissionService permissionService, ICommissionModelFctory commissionModelFctory, IParentChildSumOrderStatsService parentChildSumOrderStatsService)
+    public CommissionController(IPermissionService permissionService, ICommissionModelFctory commissionModelFctory, IParentChildSumOrderStatsService parentChildSumOrderStatsService, IParentBankDetailsService parentBankDetailsService)
     {
         _permissionService = permissionService;
         _commissionModelFctory = commissionModelFctory;
         _parentChildSumOrderStatsService = parentChildSumOrderStatsService;
+        _parentBankDetailsService = parentBankDetailsService;        
     }
 
     #endregion
@@ -76,6 +78,8 @@ public partial class CommissionController : BaseAdminController
         if (entity == null)
             return null;
 
+        var parentBankDetails = await _parentBankDetailsService.GetParentBankDetailsAsync(entity.ParentId);
+
         var model = new ParentChildSumOrderStatsModel
         {
             Id = entity.Id,
@@ -93,7 +97,14 @@ public partial class CommissionController : BaseAdminController
             PayAmount = entity.PayAmount,
             ExecuteStartDateTime = entity.ExecuteStartDateTime,
             ExecuteEndDateTime = entity.ExecuteEndDateTime,
-            Status = entity.IsPaid ? "Paid" : "Not Paid"
+            Status = entity.IsPaid ? "Paid" : "Not Paid",
+            BankName = parentBankDetails?.BankName ?? "",
+            BranchName = parentBankDetails?.BranchName ?? "",
+            BranchAddress = parentBankDetails?.BranchAddress ?? "",
+            AccountHolderName = parentBankDetails?.AccountHolderName ?? "",
+            AccountNumber = parentBankDetails?.AccountNumber ?? "",
+            AccountType = parentBankDetails?.AccountType ?? "",
+            SwiftOrBicCode = parentBankDetails?.SwiftOrBicCode ?? ""
         };
 
         return View(model);
