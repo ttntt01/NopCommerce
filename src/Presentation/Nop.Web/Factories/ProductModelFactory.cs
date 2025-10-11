@@ -1559,15 +1559,33 @@ public partial class ProductModelFactory : IProductModelFactory
         }
 
         var productFile = await _fileService.GetFileByProductIdAsync(product.Id);
-        var mimeType = productFile.MimeType;
-        model.DefaultFileModel = new FileModel
+
+        if (productFile != null)
         {
-            Id = productFile.Id,
-            ProductId = productFile.ProductId,
-            MimeType = mimeType.Substring(mimeType.LastIndexOf("/") + 1),
-            SeoFilename = productFile.SeoFilename,
-            VirtualPath = productFile.VirtualPath,
-        };
+            var mimeType = productFile.MimeType ?? string.Empty;
+            model.DefaultFileModel = new FileModel
+            {
+                Id = productFile.Id,
+                ProductId = productFile.ProductId,
+                MimeType = mimeType.Contains("/")
+                    ? mimeType.Substring(mimeType.LastIndexOf("/") + 1)
+                    : mimeType, // fallback if mimeType doesn't contain "/"
+                SeoFilename = productFile.SeoFilename,
+                VirtualPath = productFile.VirtualPath,
+            };
+        }
+        else
+        {
+            // ✅ Handle missing file safely (optional default values)
+            model.DefaultFileModel = new FileModel
+            {
+                Id = 0,
+                ProductId = product.Id,
+                MimeType = string.Empty,
+                SeoFilename = string.Empty,
+                VirtualPath = string.Empty
+            };                        
+        }
 
         //page sharing
         if (_catalogSettings.ShowShareButton && !string.IsNullOrEmpty(_catalogSettings.PageShareCode))
