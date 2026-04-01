@@ -745,7 +745,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
         {
             RouteName = "CustomerInfo1",
-            Title = await _localizationService.GetResourceAsync("Account.Comission"),
+            Title = await _localizationService.GetResourceAsync("Account.Commission"),
             Tab = (int)CustomerNavigationEnum.Commission,
             ItemClass = "customer-info"
         });

@@ -103,8 +103,7 @@
 
 <div class="page account-page customer-info-page">
     <div class="page-title">
-        @* <h1>@T("Account.MyAccount") - @T("Account.CustomerInfo")</h1> *@
-        <h1>Comission</h1>
+        <h1>@T("Account.MyAccount") - @T("Account.Commission")</h1>
     </div>
     <div class="page-body">
         @await Component.InvokeAsync(typeof(WidgetViewComponent), new { widgetZone = PublicWidgetZones.CustomerInfoTop, additionalData = Model })
@@ -112,20 +111,19 @@
         <div asp-validation-summary="ModelOnly" class="message-error"></div>
         <div class="fieldset">
             <div class="title">
-                @* <strong>@T("Account.YourPersonalDetails")</strong> *@
-                <strong>Your commission</strong>
+                <strong>@T("Account.YourCommission")</strong>
                 </br>
                 <label style="color:red; font-size: 13px">
-                    * Commission will be updated by every end of the month:
+                    @T("Account.CommissionUpdate")
                     <span style="color:#777777; font-weight: bold; font-style: italic" id="lastDay-month"></span>
                 </label>
                 </br>
                 <label style="color:red; font-size: 13px">
-                    * Commissions for the previous month will be paid within the first 5 working business days of this month.
+                    @T("Account.CommissionPaid")
                 </label>
                 </br>
                 <label style="color:red; font-size: 13px">
-                    * Please check your commission payment status starting from:
+                    @T("Account.CommissionCheck")
                     <span style="color:#777777; font-weight: bold; font-style: italic" id="firstDayNext-month"></span>
                 </label>
             </div>
@@ -138,13 +136,13 @@
                     @if (Model.ParentChildSumOrderStatsModel.IsPaid)
                     {
                         <div style="float: left; font-weight: bold; font-size: 16px; color: green;" id="paid-status">
-                            ✔ Paid
+                            ✔ @T("Account.Commission.IsPaid")
                         </div>
                     }
                     else
                     {
                         <div style="float: left; font-weight: bold; font-size: 16px; color: red;" id="paid-status">
-                            ✖ Not Paid
+                            ✖ @T("Account.Commission.IsNotPaid")
                         </div>
                     }
 
@@ -154,14 +152,13 @@
                     <!-- Right: Total Salary -->
                     <div style="float: right; font-weight: bold; font-size: 16px;">
                         <div id="salary-month" style="font-size: 14px;"></div>
-                        Total Salary: ¥ <span id="total-salary">@payAmt</span>
+                        @T("Account.Commission.TotalCommission") ¥ <span id="total-salary">@payAmt</span>
                     </div>
                 </div>
             </div>
             </br>
-            <div class="title">
-                @* <strong>@T("Account.YourPersonalDetails")</strong> *@
-                <strong>Your downline registration</strong>
+            <div class="title">                
+                <strong>@T("Account.Commission.YourDownlineReg")</strong>
             </div>
             <div class="form-fields">
                 <div class="inputs">
@@ -176,11 +173,10 @@
             <div class="buttons">
                 <button type="submit" id="save" name="save" class="button-1 save-customer-info-button">@T("Common.Save")</button>
             </div>
-            <div class="title">
-                @* <strong>@T("Account.YourPersonalDetails")</strong> *@
-                <strong>Total downline count</strong>
+            <div class="title">                
+                <strong>@T("Account.Commission.TotalDownlineCount")</strong>
                 </br>
-                <label style="color:red; font-size: 13px">* New added downline will be reflected by end of the day. Please come back and check by tomorrow.</label>
+                <label style="color:red; font-size: 13px">@T("Account.Commission.NewlyAddedDownline")</label>
                 </br>
                 @{
                     var lastUpdatedTimeUtc = Model.ParentChildLineStatsModel.FirstOrDefault()?.LastUpdatedTimeUtc;
@@ -190,11 +186,11 @@
                 }
                 @if (Model.ParentChildLineStatsModel.FirstOrDefault().Id > 0)
                 {
-                    <label style="color:red; font-size: 13px">* Latest total downline count updated at: <span style="color:#777777; font-weight: bold; font-style: italic">@lastUpdatedLocal.Value.ToString("yyyy-MM-dd HH:mm:ss")</span></label>
+                    <label style="color:red; font-size: 13px">@T("Account.Commission.DownlineUpdate") <span style="color:#777777; font-weight: bold; font-style: italic">@lastUpdatedLocal.Value.ToString("yyyy-MM-dd HH:mm:ss")</span></label>
                 }
                 else
                 {
-                    <label style="color:red; font-size: 13px">* 👀 No downlines spotted! It’s just you and... you. Time to call your friends, cousins, etc — let’s build your team! 🚀</label>
+                    <label style="color:red; font-size: 13px">* 👀 @T("Account.Commission.NoDownline") 🚀</label>
                 }
             </div>
             <div class="form-fields">
@@ -202,10 +198,10 @@
                     <table style="width: 100%; border-collapse: collapse; border: 1px solid black; background-color: #f0f0f0;">
                         <thead style="background-color: #d0d0d0; height: 25px">
                             <tr>
-                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 1 (4%)</label></th>
-                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 2 (2%)</label></th>
-                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 3 (1%)</label></th>
-                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">Line 4 (0.5%)</label></th>
+                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">@T("Account.Commission.Line1")</label></th>
+                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">@T("Account.Commission.Line2")</label></th>
+                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">@T("Account.Commission.Line3")</label></th>
+                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">@T("Account.Commission.Line4")</label></th>
                             </tr>
                         </thead>
                         <tbody style="height: 35px">
@@ -234,67 +230,68 @@
                 </div>
             </div>
             </br></br>
-            <div class="title">
-                @* <strong>@T("Account.YourPersonalDetails")</strong> *@
-                <strong>Your bank details</strong>
+            <div class="title">                
+                <strong>@T("Account.Commission.YourBankDetails")</strong>
                 </br>
-                <label style="color:red; font-size: 13px">* Hi @Model.Username, we will be transferring commission to your bank account from Malaysia, and we need your full banking details to complete the international transfer. Could you kindly provide us with the following information: </label>
+                <label style="color:red; font-size: 13px">@T("Account.Commission.Dear") </label>
+                    <label style="color:black; font-size: 13px"><b>@Model.Username</b>, </label>
+                <label style="color:red; font-size: 13px">@T("Account.Commission.Transferring") </label>
                 </br>
             </div>
             <div class="form-fields">
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.ParentEmail" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.ParentEmail" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.ParentEmail" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
                     <!-- Hidden field for backend -->
                     <input type="hidden" id="IdHidden" name="ParentBankDetailsModel.Id" value="@Model.ParentBankDetailsModel?.Id" />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.BankName" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.BankName" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.BankName" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.BranchName" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.BranchName" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.BranchName" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.BranchAddress" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.BranchAddress" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.BranchAddress" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.AccountHolderName" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.AccountHolderName" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.AccountHolderName" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.AccountNumber" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.AccountNumber" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.AccountNumber" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.AccountType" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.AccountType" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.AccountType" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.SwiftOrBicCode" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.SwiftOrBicCode" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.SwiftOrBicCode" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.CurrencyCode" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.CurrencyCode" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.CurrencyCode" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />                    
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
                     <!-- Hidden field for backend -->
                     <input type="hidden" id="CreatedDateTimeUtcHidden" name="ParentBankDetailsModel.CreatedDateTimeUtc" value="@Model.ParentBankDetailsModel?.CreatedDateTimeUtc" />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" asp-postfix=":"></label>
+                    <label asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" asp-postfix=":" style="margin-right: 50px;"></label>
                     <input asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
                 </div>
                 <div class="inputs">
@@ -359,18 +356,79 @@
                     if (data.error) {
                         //alert("Error: " + data.error);
 
-                        $('#error')
-                            .text(data.error)
-                            .addClass("field-validation-error")
-                            .removeClass("field-validation-valid");
-                    } else {
-                        $('#error')
-                            .text(data.message)
-                            .removeClass("field-validation-error")
-                            .addClass("field-validation-valid")
-                            .css("color", "green");
+                        if (data.error === 'Email is required.') {
+                            $('#error')
+                                .text('@T("Account.Commission.Error1")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
 
-                        //location.href = data.redirect;
+                        if (data.error === 'Invalid email format.') {
+                            $('#error')
+                                .text('@T("Account.Commission.Error2")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'You are not allowed to add yourself as a Line 2 downline.') {
+                            $('#error')
+                                .text('@T("Account.Commission.Error3")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'The user does not exist. Please ask the user to register first.') {
+                            $('#error')
+                                .text('@T("Account.Commission.Error4")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'This user has already been registered under another parent.') {
+                            $('#error')
+                                .text('@T("Account.Commission.Error5")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'You cannot add your parent as your child.') {
+                            $('#error')
+                                .text('@T("Account.Commission.Error6")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'A child is not allowed to add their parent as a downline.') {
+                            $('#error')
+                                .text('@T("Account.Commission.Error7")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'Failed to add your new Line 2 downline. Please contact the administrator for assistance.') {
+                            $('#error')
+                                .text('@T("Account.Commission.Error8")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+                    } else {
+                        if (data.message === 'Your new Line 2 downline has been successfully added.') {
+                            $('#error')
+                                .text('@T("Account.Commission.Success")')
+                                .removeClass("field-validation-error")
+                                .addClass("field-validation-valid")
+                                .css("color", "green");
+
+                                //location.href = data.redirect;
+                            }
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -412,20 +470,80 @@
                 dataType: "json",
                 success: function (data) {
                     if (data.error) {
-                        $('#error1')
-                            .text(data.error)
-                            .addClass("field-validation-error")
-                            .removeClass("field-validation-valid")
-                            .css("color", "red");
-                    } else {
-                        $('#error1')
-                            .text(data.message)
-                            .removeClass("field-validation-error")
-                            .addClass("field-validation-valid")
-                            .css("color", "green");
+                        if (data.error === 'Bank name is required.') {
+                            $('#error1')
+                                .text('@T("Account.CommissionAddBank.Error1")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
 
-                        // Optional redirect if backend returns redirect url
-                        // if (data.redirect) location.href = data.redirect;
+                        if (data.error === 'Bank branch name is required.') {
+                            $('#error1')
+                                .text('@T("Account.CommissionAddBank.Error2")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'Bank branch address is required.') {
+                            $('#error1')
+                                .text('@T("Account.CommissionAddBank.Error3")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'Bank account holder name is required.') {
+                            $('#error1')
+                                .text('@T("Account.CommissionAddBank.Error4")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'Bank account number is required.') {
+                            $('#error1')
+                                .text('@T("Account.CommissionAddBank.Error5")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'Bank account type is required.') {
+                            $('#error1')
+                                .text('@T("Account.CommissionAddBank.Error6")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'Bank Swift or Bic code is required.') {
+                            $('#error1')
+                                .text('@T("Account.CommissionAddBank.Error7")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+
+                        if (data.error === 'Failed to add your bank details. Please contact the administrator for assistance.') {
+                            $('#error1')
+                                .text('@T("Account.CommissionAddBank.Error8")')
+                                .addClass("field-validation-error")
+                                .removeClass("field-validation-valid")
+                                .css("color", "red");
+                        }
+                    } else {
+                        if (data.message === 'Your bank details has been successfully added.') {
+                            $('#error1')
+                                .text('@T("Account.CommissionAddBank.Success")')
+                                .removeClass("field-validation-error")
+                                .addClass("field-validation-valid")
+                                .css("color", "green");
+
+                            // Optional redirect if backend returns redirect url
+                            // if (data.redirect) location.href = data.redirect;
+                        }
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -496,28 +614,88 @@
                     dataType: "json",
                     success: function (data) {
                         if (data.error) {
-                            $('#error1')
-                                .text(data.error)
-                                .addClass("field-validation-error")
-                                .removeClass("field-validation-valid")
-                                .css("color", "red");
+                            if (data.error === 'Bank name is required.') {
+                                $('#error1')
+                                    .text('@T("Account.CommissionEditBank.Error1")')
+                                    .addClass("field-validation-error")
+                                    .removeClass("field-validation-valid")
+                                    .css("color", "red");
+                            }
+
+                            if (data.error === 'Bank branch name is required.') {
+                                $('#error1')
+                                    .text('@T("Account.CommissionEditBank.Error2")')
+                                    .addClass("field-validation-error")
+                                    .removeClass("field-validation-valid")
+                                    .css("color", "red");
+                            }
+
+                            if (data.error === 'Bank branch address is required.') {
+                                $('#error1')
+                                    .text('@T("Account.CommissionEditBank.Error3")')
+                                    .addClass("field-validation-error")
+                                    .removeClass("field-validation-valid")
+                                    .css("color", "red");
+                            }
+
+                            if (data.error === 'Bank account holder name is required.') {
+                                $('#error1')
+                                    .text('@T("Account.CommissionEditBank.Error4")')
+                                    .addClass("field-validation-error")
+                                    .removeClass("field-validation-valid")
+                                    .css("color", "red");
+                            }
+
+                            if (data.error === 'Bank account number is required.') {
+                                $('#error1')
+                                    .text('@T("Account.CommissionEditBank.Error5")')
+                                    .addClass("field-validation-error")
+                                    .removeClass("field-validation-valid")
+                                    .css("color", "red");
+                            }
+
+                            if (data.error === 'Bank account type is required.') {
+                                $('#error1')
+                                    .text('@T("Account.CommissionEditBank.Error6")')
+                                    .addClass("field-validation-error")
+                                    .removeClass("field-validation-valid")
+                                    .css("color", "red");
+                            }
+
+                            if (data.error === 'Bank Swift or Bic code is required.') {
+                                $('#error1')
+                                    .text('@T("Account.CommissionEditBank.Error7")')
+                                    .addClass("field-validation-error")
+                                    .removeClass("field-validation-valid")
+                                    .css("color", "red");
+                            }
+
+                            if (data.error === 'Failed to update your bank details. Please contact the administrator for assistance.') {
+                                $('#error1')
+                                    .text('@T("Account.CommissionEditBank.Error8")')
+                                    .addClass("field-validation-error")
+                                    .removeClass("field-validation-valid")
+                                    .css("color", "red");
+                            }
                         } else {
-                            $('#error1')
-                                .text(data.message)
-                                .removeClass("field-validation-error")
-                                .addClass("field-validation-valid")
-                                .css("color", "green");
+                            if (data.message === 'Your bank details has been successfully updated.') {
+                                $('#error1')
+                                    .text('@T("Account.CommissionEditBank.Success")')
+                                    .removeClass("field-validation-error")
+                                    .addClass("field-validation-valid")
+                                    .css("color", "green");
 
-                            // ✅ Lock inputs after successful update
-                            inputs.forEach(input => {
-                                input.disabled = true;
-                                originalValues[input.name] = input.value;
-                            });
+                                // ✅ Lock inputs after successful update
+                                inputs.forEach(input => {
+                                    input.disabled = true;
+                                    originalValues[input.name] = input.value;
+                                });
 
-                            editBtn.textContent = "Edit";
-                            editBtn.classList.remove("updating");
-                            cancelBtn?.classList.remove("visible");
-                            if (saveBtn) saveBtn.disabled = true;
+                                editBtn.textContent = "Edit";
+                                editBtn.classList.remove("updating");
+                                cancelBtn?.classList.remove("visible");
+                                if (saveBtn) saveBtn.disabled = true;
+                            }
                         }
                     },
                     error: function (jqXHR, textStatus, errorThrown) {

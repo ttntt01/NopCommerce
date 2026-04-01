@@ -1509,32 +1509,32 @@ public partial class CustomerController : BasePublicController
             // Validate cannot add yourself as child
             if (email.Equals(modelEmail))
             {
-                return Json(new { error = "Adding yourself as a (Line 2) downline is not allowed." });
+                return Json(new { error = "You are not allowed to add yourself as a Line 2 downline." });
             }
 
             var customer = await _customerService.GetCustomerByEmailAsync(email);
 
             if (customer == null)
             {
-                return Json(new { error = "User not exist. Please contact the user to register." });
+                return Json(new { error = "The user does not exist. Please ask the user to register first." });
             }
 
             // One parent (line 1) can have multiple children, but a child can only be registered once.
             if (await _parentChildRelationsService.IsChildAlreadyRegisteredAsync(customer.Id))
             {
-                return Json(new { error = "This child has already been registered under another parent." });
+                return Json(new { error = "This user has already been registered under another parent." });
             }
 
             // Parent (line 1) cannot add another parent (line 1) as a child.
             if (await _parentChildRelationsService.IsChildAlsoAParentAsync(email))
             {
-                return Json(new { error = "You cannot add another parent as your child." });
+                return Json(new { error = "You cannot add your parent as your child." });
             }
 
             // Child (line 2) cannot add parent (line 1) as their child.
             if (await _parentChildRelationsService.IsChildTryingToAddParentAsync(email, modelEmail))
             {
-                return Json(new { error = "A child is not allowed to add a parent as their downline." });
+                return Json(new { error = "A child is not allowed to add their parent as a downline." });
             }
 
 
@@ -1559,13 +1559,13 @@ public partial class CustomerController : BasePublicController
             {
                 return Json(new
                 {
-                    message = "You had successfully added your new (Line 2) downline."
+                    message = "Your new Line 2 downline has been successfully added."
                     //redirect = Url.RouteUrl("CustomerInfo1")
                 });
             }
             else
             {
-                return Json(new { error = "Unsuccessfully added your new (Line 2) downline. Please contact admin." });
+                return Json(new { error = "Failed to add your new Line 2 downline. Please contact the administrator for assistance." });
             }
         }
         catch (Exception ex)
@@ -1584,43 +1584,43 @@ public partial class CustomerController : BasePublicController
             // Validate bank name is null or empty
             if (string.IsNullOrWhiteSpace(model.BankName))
             {
-                return Json(new { error = "Bank Name is required." });
+                return Json(new { error = "Bank name is required." });
             }
 
             // Validate bank branch name is null or empty
             if (string.IsNullOrWhiteSpace(model.BranchName))
             {
-                return Json(new { error = "Bank Branch Name is required." });
+                return Json(new { error = "Bank branch name is required." });
             }
 
             // Validate bank branch address is null or empty
             if (string.IsNullOrWhiteSpace(model.BranchAddress))
             {
-                return Json(new { error = "Bank Branch Address is required." });
+                return Json(new { error = "Bank branch address is required." });
             }
 
             // Validate bank account holder name is null or empty
             if (string.IsNullOrWhiteSpace(model.AccountHolderName))
             {
-                return Json(new { error = "Bank Account Holder Name is required." });
+                return Json(new { error = "Bank account holder name is required." });
             }
 
             // Validate bank account number is null or empty
             if (string.IsNullOrWhiteSpace(model.AccountNumber))
             {
-                return Json(new { error = "Bank Account Number is required." });
+                return Json(new { error = "Bank account number is required." });
             }
 
             // Validate bank account type is null or empty
             if (string.IsNullOrWhiteSpace(model.AccountType))
             {
-                return Json(new { error = "Bank Account Type is required." });
+                return Json(new { error = "Bank account type is required." });
             }
 
             // Validate bank swift/ bic code is null or empty
             if (string.IsNullOrWhiteSpace(model.SwiftOrBicCode))
             {
-                return Json(new { error = "Bank Swift/ BIC Code is required." });
+                return Json(new { error = "Bank Swift or Bic code is required." });
             }
 
             var modelCustomer = new Customer();
@@ -1651,12 +1651,12 @@ public partial class CustomerController : BasePublicController
             {
                 return Json(new
                 {
-                    message = "You had successfully added your bank details."                    
+                    message = "Your bank details has been successfully added."
                 });
             }
             else
             {
-                return Json(new { error = "Failed to add your bank details." });
+                return Json(new { error = "Failed to add your bank details. Please contact the administrator for assistance." });
             }
         }
         catch (Exception ex)
@@ -1674,43 +1674,43 @@ public partial class CustomerController : BasePublicController
             // Validate bank name is null or empty
             if (string.IsNullOrWhiteSpace(model.BankName))
             {
-                return Json(new { error = "Bank Name is required." });
+                return Json(new { error = "Bank name is required." });
             }
 
             // Validate bank branch name is null or empty
             if (string.IsNullOrWhiteSpace(model.BranchName))
             {
-                return Json(new { error = "Bank Branch Name is required." });
+                return Json(new { error = "Bank branch name is required." });
             }
 
             // Validate bank branch address is null or empty
             if (string.IsNullOrWhiteSpace(model.BranchAddress))
             {
-                return Json(new { error = "Bank Branch Address is required." });
+                return Json(new { error = "Bank branch address is required." });
             }
 
             // Validate bank account holder name is null or empty
             if (string.IsNullOrWhiteSpace(model.AccountHolderName))
             {
-                return Json(new { error = "Bank Account Holder Name is required." });
+                return Json(new { error = "Bank account holder name is required." });
             }
 
             // Validate bank account number is null or empty
             if (string.IsNullOrWhiteSpace(model.AccountNumber))
             {
-                return Json(new { error = "Bank Account Number is required." });
+                return Json(new { error = "Bank account number is required." });
             }
 
             // Validate bank account type is null or empty
             if (string.IsNullOrWhiteSpace(model.AccountType))
             {
-                return Json(new { error = "Bank Account Type is required." });
+                return Json(new { error = "Bank account type is required." });
             }
 
             // Validate bank swift/ bic code is null or empty
             if (string.IsNullOrWhiteSpace(model.SwiftOrBicCode))
             {
-                return Json(new { error = "Bank Swift/ BIC Code is required." });
+                return Json(new { error = "Bank Swift or Bic code is required." });
             }
 
             var modelCustomer = new Customer();
@@ -1742,12 +1742,12 @@ public partial class CustomerController : BasePublicController
             {
                 return Json(new
                 {
-                    message = "You have successfully updated your bank details."
+                    message = "Your bank details has been successfully updated."
                 });
             }
             else
             {
-                return Json(new { error = "Failed to update your bank details." });
+                return Json(new { error = "Failed to update your bank details. Please contact the administrator for assistance." });
             }
         }
         catch (Exception ex)
