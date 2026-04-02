@@ -60,28 +60,24 @@
 
 <style>
     .inputs {
+        display: flex;
+        align-items: center;
         margin-bottom: 12px;
+        flex-wrap: wrap; /* allow stacking on small screen */
     }
 
-    /* key part */
+    /* Label */
     .inputs label {
-        display: inline-block;
-        min-width: 180px; /* just set a safe minimum */
+        flex: 0 0 180px; /* fixed width for desktop */
         text-align: right;
-        position: relative;
         padding-right: 10px;
+        position: relative;
     }
 
-    /* colon alignment */
+    /* Colon */
     .inputs label::after {
         content: ":";
         right: 0;
-    }
-
-    /* input alignment */
-    .inputs input {
-        display: inline-block;
-        width: calc(100% - 340px); /* label + spacing */
     }
 </style>
 
