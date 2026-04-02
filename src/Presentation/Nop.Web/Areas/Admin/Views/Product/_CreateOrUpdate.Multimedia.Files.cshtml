@@ -45,8 +45,20 @@
             $('#productfile-grid').on('xhr.dt', function (e, settings, json, xhr) {
                 if (json && json.ErrorMessage) {
                     // Show error in the div
-                    $('#productfile-error').text(json.ErrorMessage);
-                    disableUploader("productfile_" + @Model.Id);
+                    if (json.ErrorMessage === 'No product found with the specified id') {
+                        $('#productfile-error').text('@T("Admin.ListingFileUpload.Error1")');
+                        disableUploader("productfile_" + @Model.Id);
+                    }
+
+                    if (json.ErrorMessage === 'This is not your product.') {
+                        $('#productfile-error').text('@T("Admin.ListingFileUpload.Error2")');
+                        disableUploader("productfile_" + @Model.Id);
+                    }
+
+                    if (json.ErrorMessage === '* A file already exists for this product. You must delete the old one before uploading a new one.') {
+                        $('#productfile-error').text('@T("Admin.ListingFileUpload.Error3")');
+                        disableUploader("productfile_" + @Model.Id);
+                    }
                 } else {
                     // Clear error if none
                     $('#productfile-error').text('');

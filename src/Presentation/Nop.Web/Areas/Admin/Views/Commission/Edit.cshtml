@@ -4,13 +4,13 @@
     //page title
     ViewBag.PageTitle = T("Admin.Commission").Text;
     //active menu item (system name)
-    NopHtml.SetActiveMenuItemSystemName("Comission");
+    NopHtml.SetActiveMenuItemSystemName("Commission");
 }
 
 <form asp-controller="Commission" asp-action="Update" method="post">
     <div class="content-header clearfix">
         <h1 class="float-left">   
-            @T("Admin.Comission.EditComissionDetails") - @Model.ParentEmail
+            @T("Admin.Commission.EditCommissionDetails") - @Model.ParentEmail
             <small>
                 <i class="fas fa-arrow-circle-left"></i>
                 <a asp-action="Index">@T("Admin.Comission.BackToList")</a>

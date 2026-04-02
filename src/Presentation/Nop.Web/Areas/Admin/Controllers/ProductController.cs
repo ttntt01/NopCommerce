@@ -1715,7 +1715,7 @@ public partial class ProductController : BaseAdminController
             return Json(new
             {
                 success = false,
-                message = "A file already exists for this product. You must delete the old one before uploading a new one."
+                message = "* A file already exists for this product. You must delete the old one before uploading a new one."
             });
         }            
 
@@ -1789,7 +1789,7 @@ public partial class ProductController : BaseAdminController
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null && product.VendorId != currentVendor.Id)
-            errMsg = "This is not your product";
+            errMsg = "This is not your product.";
 
         var productFile = await _productService.GetProductFileByProductIdAsync(product.Id);
         if (productFile.Count > 0)

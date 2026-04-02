@@ -58,6 +58,33 @@
     }
 </style>
 
+<style>
+    .inputs {
+        margin-bottom: 12px;
+    }
+
+    /* key part */
+    .inputs label {
+        display: inline-block;
+        min-width: 180px; /* just set a safe minimum */
+        text-align: right;
+        position: relative;
+        padding-right: 10px;
+    }
+
+    /* colon alignment */
+    .inputs label::after {
+        content: ":";
+        right: 0;
+    }
+
+    /* input alignment */
+    .inputs input {
+        display: inline-block;
+        width: calc(100% - 340px); /* label + spacing */
+    }
+</style>
+
 <script type="text/javascript">
     const today = new Date();
     const year = today.getFullYear();
@@ -162,7 +189,7 @@
             </div>
             <div class="form-fields">
                 <div class="inputs">
-                    <label asp-for="Email" asp-postfix=":"></label>
+                    <label asp-for="Email"></label>
                     <input asp-for="Email" autocomplete="off" value="" />
                     <nop-required />
                     @* <span asp-validation-for="Email"></span> *@
@@ -194,40 +221,38 @@
                 }
             </div>
             <div class="form-fields">
-                <div class="inputs">
-                    <table style="width: 100%; border-collapse: collapse; border: 1px solid black; background-color: #f0f0f0;">
-                        <thead style="background-color: #d0d0d0; height: 25px">
-                            <tr>
-                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">@T("Account.Commission.Line1")</label></th>
-                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">@T("Account.Commission.Line2")</label></th>
-                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">@T("Account.Commission.Line3")</label></th>
-                                <th style="width: 25%; border: 1px solid black; "><label style="color:red; float: left">@T("Account.Commission.Line4")</label></th>
-                            </tr>
-                        </thead>
-                        <tbody style="height: 35px">
-                            @{
-                                var level1 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 1)?.ChildCount ?? 0;
-                                var level2 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 2)?.ChildCount ?? 0;
-                                var level3 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 3)?.ChildCount ?? 0;
-                                var level4 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 4)?.ChildCount ?? 0;
-                            }
-                            <tr>
-                                <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
-                                    <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level1</b></label>
-                                </td>
-                                <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
-                                    <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level2</b></label>
-                                </td>
-                                <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
-                                    <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level3</b></label>
-                                </td>
-                                <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
-                                    <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level4</b></label>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table style="width: 100%; border-collapse: collapse; border: 1px solid black; background-color: #f0f0f0;">
+                    <thead style="background-color: #d0d0d0; height: 25px">
+                        <tr>
+                            <th style="width: 25%; border: 1px solid black; text-align: center; vertical-align: middle;"><label style="color:red;">@T("Account.Commission.Line1")</label></th>
+                            <th style="width: 25%; border: 1px solid black; text-align: center; vertical-align: middle;"><label style="color:red;">@T("Account.Commission.Line2")</label></th>
+                            <th style="width: 25%; border: 1px solid black; text-align: center; vertical-align: middle;"><label style="color:red;">@T("Account.Commission.Line3")</label></th>
+                            <th style="width: 25%; border: 1px solid black; text-align: center; vertical-align: middle;"><label style="color:red;">@T("Account.Commission.Line4")</label></th>
+                        </tr>
+                    </thead>
+                    <tbody style="height: 35px">
+                        @{
+                            var level1 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 1)?.ChildCount ?? 0;
+                            var level2 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 2)?.ChildCount ?? 0;
+                            var level3 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 3)?.ChildCount ?? 0;
+                            var level4 = Model.ParentChildLineStatsModel.FirstOrDefault(x => Convert.ToInt32(x.LineLevel) == 4)?.ChildCount ?? 0;
+                        }
+                        <tr>
+                            <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level1</b></label>
+                            </td>
+                            <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level2</b></label>
+                            </td>
+                            <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level3</b></label>
+                            </td>
+                            <td style="width: 25%; border: 1px solid black; background-color: #f0f0f0;">
+                                <label style="color:#4AB2F1; display: block; width: 100%; text-align: center;"><b>@level4</b></label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             </br></br>
             <div class="title">                
@@ -240,58 +265,58 @@
             </div>
             <div class="form-fields">
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.ParentEmail" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.ParentEmail"></label>
                     <input asp-for="ParentBankDetailsModel.ParentEmail" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
                     <!-- Hidden field for backend -->
                     <input type="hidden" id="IdHidden" name="ParentBankDetailsModel.Id" value="@Model.ParentBankDetailsModel?.Id" />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.BankName" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.BankName"></label>
                     <input asp-for="ParentBankDetailsModel.BankName" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.BranchName" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.BranchName"></label>
                     <input asp-for="ParentBankDetailsModel.BranchName" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.BranchAddress" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.BranchAddress"></label>
                     <input asp-for="ParentBankDetailsModel.BranchAddress" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.AccountHolderName" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.AccountHolderName"></label>
                     <input asp-for="ParentBankDetailsModel.AccountHolderName" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.AccountNumber" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.AccountNumber"></label>
                     <input asp-for="ParentBankDetailsModel.AccountNumber" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.AccountType" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.AccountType"></label>
                     <input asp-for="ParentBankDetailsModel.AccountType" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.SwiftOrBicCode" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.SwiftOrBicCode"></label>
                     <input asp-for="ParentBankDetailsModel.SwiftOrBicCode" class="bank-input" autocomplete="off" />
                     <nop-required />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.CurrencyCode" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.CurrencyCode"></label>
                     <input asp-for="ParentBankDetailsModel.CurrencyCode" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />                    
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.CreatedDateTimeUtc"></label>
                     <input asp-for="ParentBankDetailsModel.CreatedDateTimeUtc" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
                     <!-- Hidden field for backend -->
                     <input type="hidden" id="CreatedDateTimeUtcHidden" name="ParentBankDetailsModel.CreatedDateTimeUtc" value="@Model.ParentBankDetailsModel?.CreatedDateTimeUtc" />
                 </div>
                 <div class="inputs">
-                    <label asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" asp-postfix=":" style="margin-right: 50px;"></label>
+                    <label asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc"></label>
                     <input asp-for="ParentBankDetailsModel.LastUpdatedTimeUtc" autocomplete="off" disabled style="background-color: #f0f0f0 !important; color: #555 !important; border: 1px solid #ccc !important;" />
                 </div>
                 <div class="inputs">
