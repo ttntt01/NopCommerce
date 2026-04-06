@@ -59,26 +59,65 @@
 </style>
 
 <style>
+/* Container */
+.form-fields {
+    width: 100%;
+}
+
+/* Row */
+.inputs {
+    display: flex;
+    align-items: flex-start; /* important for multi-line labels */
+    margin-bottom: 12px;
+    gap: 12px;
+}
+
+/* Label */
+.inputs label {
+    flex: 0 0 220px;              /* desktop label width */
+    text-align: right;
+    padding-right: 12px;
+    position: relative;
+
+    white-space: normal;          /* allow wrapping */
+    word-break: break-word;       /* break long text */
+    line-height: 1.4;
+}
+
+/* Colon */
+.inputs label::after {
+    content: ":";
+    right: 0;
+}
+
+/* Required star alignment */
+.inputs .required {
+    margin-left: 6px;
+}
+
+/* =========================
+   📱 MOBILE RESPONSIVE
+   ========================= */
+@@media (max-width: 576px) {
+
     .inputs {
-        display: flex;
-        align-items: center;
-        margin-bottom: 12px;
-        flex-wrap: wrap; /* allow stacking on small screen */
+        flex-direction: column;   /* stack vertically */
+        align-items: stretch;
     }
 
-    /* Label */
     .inputs label {
-        flex: 0 0 180px; /* fixed width for desktop */
-        text-align: right;
-        padding-right: 10px;
-        position: relative;
+        flex: none;
+        width: 100%;
+        text-align: left;
+        padding-right: 0;
+        margin-bottom: 4px;
     }
 
-    /* Colon */
     .inputs label::after {
-        content: ":";
-        right: 0;
+        position: static;         /* move ":" inline */
+        margin-left: 4px;
     }
+}
 </style>
 
 <script type="text/javascript">
@@ -154,7 +193,7 @@
                 <!-- Salary Month at Top -->
                 <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;" id="salary-month"></div>
 
-                <div class="inputs" style="overflow: hidden; padding: 5px 0;">
+                <div class="" style="overflow: hidden; padding: 5px 0;">
                     <!-- Left: Paid Status -->
                     @if (Model.ParentChildSumOrderStatsModel.IsPaid)
                     {
@@ -599,11 +638,12 @@
         editBtn?.addEventListener("click", function (e) {
             e.preventDefault(); // Prevent normal form submit
             const isEditMode = editBtn.textContent.trim().toLowerCase() === "edit";
+            const isEditMode1 = editBtn.textContent.trim() === "編集";
 
-            if (isEditMode) {
+            if (isEditMode || isEditMode1) {
                 // ✅ Step 1: Switch to Update mode
                 inputs.forEach(input => input.disabled = false);
-                editBtn.textContent = "Update";
+                editBtn.textContent = "@T("Admin.Commission.Update")";
                 editBtn.classList.add("updating");
                 cancelBtn?.classList.add("visible");
                 if (saveBtn) saveBtn.disabled = true;
@@ -712,7 +752,7 @@
                                     originalValues[input.name] = input.value;
                                 });
 
-                                editBtn.textContent = "Edit";
+                                editBtn.textContent = "@T("Common.Edit")";
                                 editBtn.classList.remove("updating");
                                 cancelBtn?.classList.remove("visible");
                                 if (saveBtn) saveBtn.disabled = true;
@@ -733,7 +773,7 @@
                 input.disabled = true;
             });
 
-            editBtn.textContent = "Edit";
+            editBtn.textContent = "@T("Common.Edit")";
             editBtn.classList.remove("updating");
             cancelBtn.classList.remove("visible");
             if (saveBtn) saveBtn.disabled = true;
