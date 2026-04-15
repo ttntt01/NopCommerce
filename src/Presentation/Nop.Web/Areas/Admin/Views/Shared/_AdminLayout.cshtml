@@ -17,8 +17,11 @@
     var returnUrl = webHelper.GetRawUrl(Context.Request);
 
     //page title
+    /*
     string adminPageTitle = !string.IsNullOrWhiteSpace(ViewBag.PageTitle) ? ViewBag.PageTitle + " / " : "";
     adminPageTitle += T("Admin.PageTitle").Text;
+    */
+    string adminPageTitle = T("Admin.PageTitle").Text;
 
     //has "Manage Maintenance" permission?
     var canManageMaintenance = await permissionService.AuthorizeAsync(StandardPermissionProvider.ManageMaintenance);
