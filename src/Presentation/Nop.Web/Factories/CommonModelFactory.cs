@@ -229,17 +229,17 @@ public partial class CommonModelFactory : ICommonModelFactory
             var logoPictureId = _storeInformationSettings.LogoPictureId;
 
 
-            //Comment logo
-            //if (logoPictureId > 0)
-            //    logo = await _pictureService.GetPictureUrlAsync(logoPictureId, showDefaultPicture: false);
+            // frontend logo
+            if (logoPictureId > 0)
+                logo = await _pictureService.GetPictureUrlAsync(logoPictureId, showDefaultPicture: false);
 
-            //if (string.IsNullOrEmpty(logo))
-            //{
-            //    //use default logo
-            //    var pathBase = _httpContextAccessor.HttpContext.Request.PathBase.Value ?? string.Empty;
-            //    var storeLocation = _mediaSettings.UseAbsoluteImagePath ? _webHelper.GetStoreLocation() : $"{pathBase}/";
-            //    logo = $"{storeLocation}Themes/{await _themeContext.GetWorkingThemeNameAsync()}/Content/images/logo.png";
-            //}
+            if (string.IsNullOrEmpty(logo))
+            {
+                //use default logo
+                var pathBase = _httpContextAccessor.HttpContext.Request.PathBase.Value ?? string.Empty;
+                var storeLocation = _mediaSettings.UseAbsoluteImagePath ? _webHelper.GetStoreLocation() : $"{pathBase}/";
+                logo = $"{storeLocation}Themes/{await _themeContext.GetWorkingThemeNameAsync()}/Content/images/logo.png";
+            }
 
             return logo;
         });
